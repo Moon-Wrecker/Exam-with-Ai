@@ -1,0 +1,23 @@
+/usr/bin/celery:22: DeprecationWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html
+  from pkg_resources import load_entry_point
+Traceback (most recent call last):
+  File "/usr/bin/celery", line 26, in <module>
+    load_entry_point("celery", "console_scripts", "celery")()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/pkg_resources/__init__.py", line 536, in load_entry_point
+    return get_distribution(dist).load_entry_point(group, name)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/pkg_resources/__init__.py", line 2931, in load_entry_point
+    return ep.load()
+           ^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/pkg_resources/__init__.py", line 2517, in load
+    self.require(*args, **kwargs)
+  File "/usr/lib/python3/dist-packages/pkg_resources/__init__.py", line 2540, in require
+    items = working_set.resolve(reqs, env, installer, extras=self.extras)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/pkg_resources/__init__.py", line 829, in resolve
+    dist = self._resolve_dist(
+           ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/pkg_resources/__init__.py", line 875, in _resolve_dist
+    raise VersionConflict(dist, req).with_context(dependent_req)
+pkg_resources.VersionConflict: (vine 5.0.0 (/usr/lib/python3/dist-packages), Requirement.parse('vine<6.0,>=5.1.0'))

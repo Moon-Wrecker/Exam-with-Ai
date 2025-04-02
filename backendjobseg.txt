@@ -1,0 +1,244 @@
+# config.py
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+import os
+
+
+app = Flask(__name__, template_folder="templates",static_folder="static")
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+app.config['SECRET_KEY'] = 'secret'
+
+db = SQLAlchemy(app)
+
+
+# config.py
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+EXPORT_FOLDER = os.path.join(BASE_DIR, 'exports')
+
+EMAIL_HOST = 'smtp.gmail.com' #simple mail transfer protocol
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'm.manaskaushalswati@gmail.com'
+EMAIL_HOST_PASSWORD = 'xglj iucu ryft apqr'
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL='m.manaskaushalswati@gmail.com'
+
+from smtplib import SMTP
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+import os
+from config import EMAIL_HOST, EMAIL_PORT, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, DEFAULT_FROM_EMAIL
+from datetime import datetime, timedelta
+from models import *
+from email import encoders
+import smtplib
+from email.utils import formataddr
+
+
+def send_email_notification(subject, message, to_email, attachment=None):
+    
+    # Email setup
+    # Create the email
+    msg = MIMEMultipart()
+    msg['From'] = formataddr(('Manas Rastogi', EMAIL_HOST_USER))
+    msg['To'] = to_email
+    msg['Subject'] = subject
+    msg.attach(MIMEText(message, 'plain'))
+
+    # Attach the file if provided
+    if attachment:
+        try:
+            # Open the file in binary mode
+            with open(attachment, 'rb') as file:
+                # Create the attachment part
+                part = MIMEBase('application', 'octet-stream')
+                part.set_payload(file.read())
+                encoders.encode_base64(part)
+                part.add_header('Content-Disposition', f"attachment; filename={os.path.basename(attachment)}")
+                
+                # Attach the part to the message
+                msg.attach(part)
+        except Exception as e:
+            print(f"Failed to attach file: {e}")
+
+    # Sending the email
+    try:
+        with smtplib.SMTP(EMAIL_HOST, EMAIL_PORT) as server:  # Replace with your SMTP server details
+            server.starttls()
+            server.login(EMAIL_HOST_USER, EMAIL_HOST_PASSWORD)
+            server.sendmail(EMAIL_HOST_USER, to_email, msg.as_string())
+            print(f"Email sent to {to_email}")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+
+
+def get_monthly_activity_data(customer_id):
+    # Get the date range for the last month
+    today = datetime.now()
+    first_day_of_this_month = today.replace(day=1)
+    last_day_of_last_month = first_day_of_this_month - timedelta(days=1)
+    first_day_of_last_month = last_day_of_last_month.replace(day=1)
+    
+    # Query services requested by the customer in the last month
+    requested_services = ServiceRequest.query.filter(
+        ServiceRequest.customer_id == customer_id,
+        ServiceRequest.date_of_request >= first_day_of_last_month,
+        ServiceRequest.date_of_request <= last_day_of_last_month,
+        ServiceRequest.service_status == 'requested'
+    ).count()
+
+    # Query services completed for the customer in the last month
+    closed_services = ServiceRequest.query.filter(
+        ServiceRequest.customer_id == customer_id,
+        ServiceRequest.date_of_completion >= first_day_of_last_month,
+        ServiceRequest.date_of_completion <= last_day_of_last_month,
+        ServiceRequest.service_status == 'closed'
+    ).count()
+
+    # Get additional data for the report if needed, such as ratings and feedback
+    rated_services = ServiceRequest.query.filter(
+        ServiceRequest.customer_id == customer_id,
+        ServiceRequest.date_of_completion >= first_day_of_last_month,
+        ServiceRequest.date_of_completion <= last_day_of_last_month,
+        ServiceRequest.rating.isnot(None)
+    ).all()
+    
+    # Calculate average rating for the closed services in the month
+    avg_rating = (
+        sum(request.rating for request in rated_services) / len(rated_services)
+        if rated_services else 0.0
+    )
+    return {
+        "requested_services": requested_services,
+        "closed_services": closed_services,
+        "avg_rating": avg_rating,
+        "month": last_day_of_last_month.strftime("%B %Y")  # e.g., "October 2024"
+    }
+
+
+def generate_monthly_report(data):
+    # Format the message as a plain-text string
+    avg_rating = round(data['avg_rating'], 2) if data['avg_rating'] is not None else 'No ratings yet'
+
+    text_report = f"""
+    Monthly Activity Report - {data['month']}
+
+    Dear Customer,
+
+    Here is your activity report for the month of {data['month']}:
+
+    - Total Services Requested: {data['requested_services']}
+    - Total Services Completed: {data['closed_services']}
+    - Average Rating for Closed Services: 
+     {avg_rating}/5
+
+    Thank you for using our service!
+
+    Best Regards,
+    FixIt Kaka Team
+        """
+    return text_report
+
+from celery import Celery
+
+# Initialize Celery here
+celery_app = Celery()
+
+
+from extensions import celery_app  # Import celery_app from celeryconfig
+from models import *
+
+from datetime import datetime, timedelta
+from email_utils import send_email_notification,get_monthly_activity_data, generate_monthly_report 
+import csv
+import os
+
+@celery_app.task
+def daily_reminder_emails():
+    from app import app  
+
+    with app.app_context():  
+        professionals = User.query.filter_by(role='professional').all()
+        for professional in professionals:
+            # Check for pending requests
+            has_pending_requests = ServiceRequest.query.filter(
+                ServiceRequest.professional_id == professional.id,
+                ServiceRequest.service_status.in_(['requested', 'accepted'])
+            ).count() > 0
+
+            # Send reminder if either condition is met
+            if has_pending_requests:
+                subject = "Daily Reminder: Pending Service Requests"
+                message = f"Hello {professional.name},\n\nYou have pending service requests or have been inactive. Please log in and attend to any open requests."
+                recipient_email = professional.email
+                send_email_notification(subject, message, recipient_email)
+
+    return "Reminder emails sent to professionals."
+
+
+@celery_app.task
+def send_monthly_report():
+    from app import app  # Import your Flask app to access app context
+    
+    with app.app_context():
+        customers = User.query.filter_by(role='customer').all()
+        
+        for customer in customers:
+            # Get activity data specific to the customer
+            activity_data = get_monthly_activity_data(customer.id)
+
+            # Generate the HTML report
+            report_html = generate_monthly_report(activity_data)
+
+            # Send the report to the customer
+            subject = f"Your Monthly Activity Report - {activity_data['month']}"
+            send_email_notification(subject, report_html, customer.email)
+
+    return "Monthly activity report sent to customers."
+
+
+@celery_app.task
+def export_closed_service_requests(admin_email):
+    from app import app  # Import Flask app
+    from config import EXPORT_FOLDER
+    with app.app_context():  # Wrap the task in the application context
+        # Define file name and path
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        file_name = f"closed_service_requests_{timestamp}.csv"
+        file_path = os.path.join(EXPORT_FOLDER, file_name)
+        
+        # Query database for closed service requests
+        closed_requests = ServiceRequest.query.filter_by(service_status='closed').all()
+        
+        # Open a CSV file to write
+        with open(file_path, mode='w', newline='', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            # Write CSV header
+            writer.writerow([
+                'Service ID', 'Customer ID', 'Customer Name', 'Professional ID', 
+                'Professional Name', 'Service Name', 'Date of Request', 
+                'Date of Completion', 'Remarks'
+            ])
+            
+            for request in closed_requests:
+                writer.writerow([
+                    request.id,
+                    request.customer_id,
+                    request.customer.name if request.customer else "N/A",
+                    request.professional_id,
+                    request.professional.name if request.professional else "N/A",
+                    request.service.name if request.service else "N/A",
+                    request.date_of_request.strftime('%Y-%m-%d %H:%M:%S'),
+                    request.date_of_completion.strftime('%Y-%m-%d %H:%M:%S') if request.date_of_completion else "N/A",
+                    request.review or "No remarks"
+                ])
+        
+        subject = "Closed Service Requests Export Complete"
+        message = f"Your requested CSV file is ready. Please find it attached."
+        
+        send_email_notification(subject, message, admin_email, attachment=file_path)
+
+    return f"Export completed and file sent to {admin_email}"

@@ -1,0 +1,3089 @@
+Directory structure:
+└── ruhil-ds-lyf-record/
+    ├── README.md
+    ├── Final Report.docx
+    ├── babel.config.js
+    ├── dump.rdb
+    ├── jsconfig.json
+    ├── package.json
+    ├── test.txt
+    ├── vue.config.js
+    ├── public/
+    │   ├── index.html
+    │   └── static/
+    │       ├── img_home.css
+    │       ├── nav_bar.css
+    │       ├── nav_bar.js
+    │       ├── signup.css
+    │       ├── images/
+    │       └── logs_download/
+    │           └── Manas_trackers_2022-08-26T13:08.csv
+    └── src/
+        ├── App.vue
+        ├── main.js
+        ├── QuantifiedSelfApp-FLASK/
+        │   ├── README.md
+        │   ├── API DOCUMENTATION.yml
+        │   ├── celerybeat-schedule.db
+        │   ├── database.sqlite3
+        │   ├── main.py
+        │   ├── requirements.txt
+        │   ├── Application/
+        │   │   ├── api.py
+        │   │   ├── cache_instance.py
+        │   │   ├── celery_tasks.py
+        │   │   ├── controller_celery.py
+        │   │   ├── controller_dash.py
+        │   │   ├── controller_index.py
+        │   │   ├── database.py
+        │   │   ├── graph.py
+        │   │   ├── mail.py
+        │   │   ├── models.py
+        │   │   ├── monthly_report.py
+        │   │   ├── timestamp.py
+        │   │   ├── to_csv.py
+        │   │   ├── workers.py
+        │   │   ├── ApiFunctions/
+        │   │   │   ├── allApiFunctions.py
+        │   │   │   └── __pycache__/
+        │   │   └── __pycache__/
+        │   ├── __pycache__/
+        │   ├── static/
+        │   │   ├── img_home.css
+        │   │   ├── nav_bar.css
+        │   │   ├── nav_bar.js
+        │   │   ├── signup.css
+        │   │   ├── images/
+        │   │   └── logs_download/
+        │   │       └── Manas_trackers_2022-08-26T13:08.csv
+        │   └── templates/
+        │       ├── About.html
+        │       ├── add_log.html
+        │       ├── add_tracker.html
+        │       ├── dashboard.html
+        │       ├── index.html
+        │       ├── signup.html
+        │       ├── update_log.html
+        │       ├── update_tracker.html
+        │       ├── view_tracker.html
+        │       ├── view_trackers.html
+        │       └── email_templates/
+        │           ├── daily_reminder.html
+        │           ├── download_ready.html
+        │           ├── forgot_pass.html
+        │           ├── report.css
+        │           ├── report.html
+        │           └── report_mail_temp.html
+        ├── assets/
+        ├── components/
+        │   ├── Dashboard.vue
+        │   ├── addLogComp.vue
+        │   ├── createTrackerComp.vue
+        │   ├── deleteLogComp.vue
+        │   ├── deleteTrackerComp.vue
+        │   ├── forgotPassComp.vue
+        │   ├── navBar.vue
+        │   ├── signinup.vue
+        │   ├── trackerDetailsComp.vue
+        │   ├── updateLogComp.vue
+        │   ├── updateTrackerComp.vue
+        │   └── viewTrackersComp.vue
+        ├── router/
+        │   └── index.js
+        ├── store/
+        │   └── index.js
+        └── views/
+            ├── Dashboard.vue
+            ├── Home.vue
+            ├── SigninUp.vue
+            ├── UpdateTracker.vue
+            ├── ViewTrackers.vue
+            ├── addLog.vue
+            ├── createTracker.vue
+            ├── deleteLog.vue
+            ├── deleteTracker.vue
+            ├── forgotPass.vue
+            ├── signout.vue
+            ├── trackerDetails.vue
+            └── updateLog.vue
+
+
+================================================
+File: README.md
+================================================
+# lyf-record : MAD2 Project
+
+Name: Manas Ruhil
+
+Roll no.: 201F2001180
+
+This is my submission for the final project for the course Modern Application Development II
+
+Term 2(May term), 2022
+
+
+
+
+# Project setup
+
+--------------
+
+## How to use
+
+NOTE - I did not copy the node_modules folder in this repository. If you decide to clone the repo and intent to use it, you need to create an empty Vue3.0 project using CLI. Copy the node modules folder into the root directory of my repo.
+
+
+Before we could use the web app, we need to setup the environment and servers for it.
+
+1) <b>Setting up the Flask server :</b>
+
+   
+   - From the QuantifiedSelfApp-FLASK folder, simply run the command 
+    
+             python3 main.py
+  
+
+
+2) <b> Setting up Redis server : </b>
+    
+    - in a new terminal tab, start the redis server by typing 
+    ----
+          redis-server
+
+
+3) <b> Setting up mailhog : </b>
+    
+    - in a new terminal tab, start the Mail-Hog server by typing 
+    ----             
+           mailhog
+    
+4) <b> Setting up Celery Worker and Celery Beat : </b>
+
+   In the QuantifiedSelfApp-FLASK of the project ->
+    
+    - in a new terminal tab, start the Celery Workers by typing 
+    ----
+          Celery --app main.celery_inst worker --loglevel=info
+    
+    ---- 
+          Celery --app main.celery_inst beat --loglevel=info
+   
+5) <b> Setting up Vue CLI server(frontend) : </b>
+    
+   In the root folder of the project ->
+
+    ---- 
+          npm run serve
+
+
+------------------
+# Using the App
+To use the app, we need to go to the front end server's URL
+
+By Default, it would be ```http://localhost:8080/``` 
+
+## Test user
+```python
+username = 'Manas'  # Case in-sensitive
+password = 'abcd'  # All lower case
+```
+
+_**NOTE THAT**_ : _When you sign up with a new user, you will have to use a strong password, 
+without which you wont be able to register. This test user has a simple password defined directly in the backend_
+
+
+------------------
+# Lyf Record
+- In this project, I have made a v2 of my QuantifiedSelfApp that I built in the last term. 
+
+### Additional features in v2:
+ - VueJS frontend framework. Single Page Application.
+ - Use of APIs
+ - Use of Async backend jobs using Celery
+ - Use of NoSQL server(Redis) for Caching, async jobs.
+ - Daily E-mail reminders and monthly user reports as pdf in the mail.
+
+
+
+================================================
+File: Final Report.docx
+================================================
+[Non-text file]
+
+
+================================================
+File: babel.config.js
+================================================
+module.exports = {
+  presets: [
+    '@vue/cli-plugin-babel/preset'
+  ]
+}
+
+
+
+================================================
+File: dump.rdb
+================================================
+[Non-text file]
+
+
+================================================
+File: jsconfig.json
+================================================
+{
+  "compilerOptions": {
+    "target": "es5",
+    "module": "esnext",
+    "baseUrl": "./",
+    "moduleResolution": "node",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "lib": [
+      "esnext",
+      "dom",
+      "dom.iterable",
+      "scripthost"
+    ]
+  }
+}
+
+
+
+
+
+
+
+
+
+================================================
+File: vue.config.js
+================================================
+const { defineConfig } = require('@vue/cli-service')
+module.exports = defineConfig({
+  transpileDependencies: true
+})
+
+
+
+================================================
+File: public/index.html
+================================================
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+      <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="/static/img_home.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+      <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+
+    <link rel="stylesheet" href="/static/nav_bar.css">
+    <script src="/static/nav_bar.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="/static/nav_bar.js"></script>
+
+      <script>
+
+      </script>
+
+
+  </head>
+  <body class="bg-dark" style="color: #38b6ff">
+    <noscript>
+      <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+</html>
+
+
+
+================================================
+File: public/static/nav_bar.js
+================================================
+$(function(){
+  var str = '#len'; //increment by 1 up to 1-nelemnts
+  $(document).ready(function(){
+    var i, stop;
+    i = 1;
+    stop = 4; //num elements
+    setInterval(function(){
+      if (i > stop){
+        return;
+      }
+      $('#len'+(i++)).toggleClass('bounce');
+    }, 500)
+  });
+});
+
+
+================================================
+File: src/App.vue
+================================================
+<template>
+  <navBar :key="$route.path"></navBar>
+<!--  <router-view :key="$route.fullPath"/>-->
+
+  <router-view v-slot="{ Component }">
+  <transition name="fade">
+    <component :is="Component" />
+  </transition>
+</router-view>
+
+</template>
+
+<script>
+import navBar from '@/components/navBar'
+export default {
+  name: 'App',
+  data(){
+    return {
+      nav_flag: ''
+    }
+  },
+  components: {
+    navBar
+  },
+  mounted() {
+    if(localStorage.login=='true') this.nav_flag = true
+    else this.nav_flag = false
+  }
+
+}
+</script>
+
+<style>
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
+}
+
+.slide-fade-leave-active {
+  transition: all 0.8s cubic-bezier(1, 0.5, 0.8, 1);
+}
+
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.75s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+
+}
+
+nav {
+  padding: 30px;
+}
+
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+.hoverable{
+  color: #328ce5 !important;
+}
+
+
+nav a.router-link-exact-active {
+  color: #42b983;
+}
+
+
+</style>
+
+
+
+================================================
+File: src/main.js
+================================================
+import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import store from './store'
+
+
+createApp(App).use(store).use(router).mount('#app')
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/README.md
+================================================
+# QuantifiedSelfApp-FLASK
+This is my submission for the final project for the course Modern Application Development I
+
+Project name - Lyf Record
+
+Roll number - 21f2001180
+
+Name - Manas Ruhil
+
+Submission date - 18 March, 2022
+
+
+
+--------------
+
+# How to use
+  - Open your terminal in the respective folder of the repository/project.
+  - First, you need to install the dependencies. Simply run the following command
+
+            pip install -r requirements.txt
+
+    This would install all the required dependencies onto your machine/environment.
+
+
+
+  - From there, simply run the command ```python3 main.py``` (recommended) or ```python main.py```
+    - If you are running the server from a web service like Replit, you will have to specify the host in the app.run() 
+    command. In the main file, simply replace ```app.run()``` with ```app.run(host='0.0.0.0')``` 
+    
+  - Then, assuming the default port 5000, simply head to any of the following URLs 
+        
+        http://localhost:5000/
+         
+        http://0.0.0.0:5000/
+        
+        http://127.0.0.1:5000/
+    A URL will also be displayed on the terminal, which can be referred to visit the web application's site.
+    
+------------------
+# Test user
+The application can be tested using a test user if you don't wish to register. Below are the credentials for the same
+
+```python
+username = 'Manas'  # Case in-sensitive
+password = 'abcd'  # All lower case
+```
+
+------------------
+# Lyf Record
+- In this project, I have built a WebApp which can be used as an event logger. 
+- Users can login to their account, create different sorts of tracker, and log values for that particular event in that tracker.
+- Each user gets the CRUD functionality for their trackers and events(logs)
+      - CRUD: Create, Read, Update, Delete
+- I have used the following major technologies:
+      
+      - Python
+      - Flask
+      - Flask-SQLAlchemy
+      - matplotlib's pyplot
+      - HTML/CSS/JS/Jinja2/Bootstrap
+      - SQLite
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/API DOCUMENTATION.yml
+================================================
+openapi: 3.0.0
+info:
+  title: Lyf Record
+  description: >-
+    This is the API for my MAD1 project - lyf Record. Basic CRUD operations can
+    be used from here
+  version: 1.2.0
+servers:
+  - url: https://127.0.0.1:5000/api/
+  - url: https://localhost:5000/api/
+tags:
+  - name: Overview
+    description: Overview operations
+  - name: Tracker's specific
+    description: Tracker specific operations
+  - name: Log's specific
+    description: Log values specific operations
+paths:
+
+  /login/:
+    description: Login to the app
+    post:
+      summary: For logging in the user
+      description: For logging in the user.
+      operationId: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  example: Manas
+                password:
+                  type: string
+                  format: password
+                  example: abcd
+                
+      tags: [Overview]
+      responses:
+        '200':
+          description: Succesful
+        '406':
+          description: incorrect username/password
+          
+  /signup/:
+    description: signup with an account on the app
+    post:
+      summary: For creating a user
+      description: For creating a user
+      operationId: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - email
+              properties:
+                username:
+                  type: string
+                  example: Manas
+                password:
+                  type: string
+                  format: password
+                  example: abcd
+                email:
+                  type: string
+                  format: email
+                
+      tags: [Overview]
+      responses:
+        '200':
+          description: Succesful
+        '406':
+          description: Failed
+          
+        
+        
+  
+  
+  /dashboard/:
+    summary: This URI will fetch all the dashboard related details
+    description: >-
+      These details include -> Streak count, tracker count, member since, list
+      of trackers, homepage graph.
+    get:
+      summary: Get dashboard info
+      description: >-
+        GET request to get all the following details -> Streak count, trackers 
+        count, member since, list of trackers, homepage graph.
+      operationId: ''
+      responses:
+        '200':
+          description: Succesful
+      tags: [Overview]
+  /trackers/view/:
+    summary: To view all the trackers for the user
+    description: >-
+      shows all the trackers with their details at the mentioned URI. Filters
+      the trackers according to the username(sign in user-name)
+    get:
+      summary: View trackers for the user
+      description: >-
+        shows all the trackers with their details at the mentioned URI.
+        Filters       the trackers according to the username
+      operationId: ''
+      tags: [Tracker's specific]
+      responses:
+        '200':
+          description: Succesful
+  /trackers/create/:
+    description: Create a new tracker resource.
+    post:
+      summary: Create tracker
+      description: For creating a new tracker.
+      operationId: ''
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - tracker_name
+                - tracker_type
+              properties:
+                tracker_name:
+                  type: string
+                  example: name for the tracker
+                tracker_type:
+                  type: string
+                  example: type of the tracker
+                tracker_desc:
+                  type: string
+                  example: Description for the tracker
+                mc_choices:
+                  type: string
+                  example: choices if the tracker type = multichoice
+      tags: [Tracker's specific]
+      responses:
+        '200':
+          description: Succesful
+        '408':
+          description: MC_choices required when tracker type is multi-choice
+  
+  
+  /{tracker_id}/log/:
+    description: Add log to the tracker
+    post:
+      summary: Log values
+      tags: [Log's specific]
+      description: For logging values to an existing tracker.
+      parameters:
+        - in: path
+          name: tracker_id
+          required: true
+          schema:
+            type: integer
+            example: 999
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  example: Value according to the tracker
+                start_val:
+                  type: string
+                  example: If tracker type = td, then this is required. Else, error
+                end_val:
+                  type: string
+                  example: If tracker type = td, then this is required. Else, error
+                choice_list:
+                  type: string
+                  example:
+                    - choices
+                    - required
+                    - if
+                    - tracker type = mc
+                note:
+                  type: string
+                  example: A sample note for the value being logged
+                timestamp:
+                  type: string
+                  format: date-time
+                  example: '2022-07-03T19:16:44.994'
+      responses:
+        '200':
+          description: Succesful
+        '411':
+          description: Value required for this request.
+        '412':
+          description: Tracker type is time duration. Start_val, end_val not provided.
+        '413':
+          description: tracker type is multi choice. Choices not provided.
+        '500':
+          description: Internal server error.
+  
+  
+  /{tracker_id}/update/:
+    description: Update a tracker
+    patch:
+      summary: Update a tracker
+      tags: [Tracker's specific]
+      description: >-
+        For updating a tracker. Populate in the respective value, according to
+        the tracker type.
+      parameters:
+        - in: path
+          name: tracker_id
+          required: true
+          schema:
+            type: integer
+            example: 999
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tracker_name_updated:
+                  type: string
+                  example: name for the tracker to update
+                tracker_desc_updated:
+                  type: string
+                  example: Description for the tracker to update
+      responses:
+        '200':
+          description: Succesful
+        '500':
+          description: Internal server error.
+  
+  
+  /{tracker_id}/delete/:
+    description: delete a tracker
+    delete:
+      tags: [Tracker's specific]
+      summary: Delete a tracker
+      description: For deleting an existing tracker.
+      parameters:
+        - in: path
+          name: tracker_id
+          required: true
+          schema:
+            type: integer
+            example: 999
+      responses:
+        '200':
+          description: Succesful
+        '500':
+          description: Internal server error.
+  
+  
+  /{tracker_id}/details/:
+    description: Display details(all logs) for a tracker
+    get:
+      tags: [Log's specific]
+      summary: Display details(all logs) for a tracker
+      description: For accessing details of an existing tracker.
+      parameters:
+        - in: path
+          name: tracker_id
+          required: true
+          schema:
+            type: integer
+            example: 999
+      responses:
+        '200':
+          description: Succesful
+        '500':
+          description: Internal server error.
+
+
+
+  /{tracker_id}/{log_id}/update/:
+    description: Update logs for a tracker
+    patch:
+      summary: Update a log
+      tags: [Log's specific]
+      description: >-
+        For updating a log for a tracker. Populate in the respective value.
+      parameters:
+        - in: path
+          name: tracker_id
+          required: true
+          schema:
+            type: integer
+            example: 999
+        
+        - in: path
+          name: log_id
+          required: true
+          schema:
+            type: integer
+            example: 888
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                value:
+                  type: string
+                  example: Value to update
+                start_val:
+                  type: string
+                  example: start_val to update
+                end_val:
+                  type: string
+                  example: end_val to update
+                choice_list:
+                  type: string
+                  example:
+                    - choices
+                    - to
+                    - update
+                note:
+                  type: string
+                  example: note to update
+                timestamp:
+                  type: string
+                  format: date-time
+                  example: '2022-07-03T19:16:44.994'
+      responses:
+        '200':
+          description: Succesful
+        '411':
+          description: Value required for the update request.
+        '412':
+          description: >-
+            Tracker type is time duration. Start_val, end_val not provided for
+            update.
+        '413':
+          description: tracker type is multi choice. Choices not provided for update.
+        '500':
+          description: Internal server error.
+  
+
+
+  /{tracker_id}/{log_id}/delete/:
+    description: Deleting a log for a tracker
+    delete:
+      tags: [Log's specific]
+      summary: Deleting a log for a tracker
+      description: For deleting a log of an existing tracker.
+      parameters:
+        - in: path
+          name: tracker_id
+          required: true
+          schema:
+            type: integer
+            example: 999
+        - in: path
+          name: log_id
+          required: true
+          schema:
+            type: integer
+            example: 999
+      responses:
+        '200':
+          description: Succesful
+        '500':
+          description: Internal server error.
+
+
+
+  /{tracker_id}/details/download/:
+    description: Download all logs for a tracker
+    get:
+      tags: [Log's specific]
+      summary: Download all logs for a tracker.
+      description: For downloading all the logs of an existing tracker.
+      parameters:
+        - in: path
+          name: tracker_id
+          required: true
+          schema:
+            type: integer
+            example: 999
+      responses:
+        '200':
+          description: Succesful
+        '500':
+          description: Internal server error.
+
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/celerybeat-schedule.db
+================================================
+[Non-text file]
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/database.sqlite3
+================================================
+[Non-text file]
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/main.py
+================================================
+from flask import Flask
+from flask_restful import Resource, Api
+from flask_sqlalchemy import SQLAlchemy
+from Application.database import db
+from flask_jwt_extended import JWTManager
+from flask_cors import CORS
+from Application import workers
+from Application.workers import *
+import os
+import celery
+
+
+# Creating the flask app variable
+app = Flask(__name__)
+
+
+# Initialising the DB using SQLAlchemy, pushing content to the app
+app.config["SQLALCHEMY_DATABASE_URI"] = 'sqlite:///database.sqlite3'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config.update(CELERY_CONFIG={
+    'broker_url': 'redis://localhost:6379/1',
+    'result_backend': 'redis://localhost:6379/1',
+    'timezone': 'Asia/Kolkata'
+})
+db.init_app(app)
+app.app_context().push()
+
+api = Api(app)
+app.app_context().push()
+
+# ----------------------------
+# Celery config  -->
+
+celery_inst = make_celery(app)
+app.app_context().push()
+# ----------------------------
+
+
+from Application.controller_index import *
+from Application.controller_dash import *
+from Application.controller_celery import *
+from Application.api import *
+# ----------------------------
+# API, CORS, JWT CONFIG ->
+# ----------------------------
+
+CORS(app)
+jwt = JWTManager(app)
+app.app_context().push()
+
+
+api.add_resource(DashboardAPI, "/api/dashboard/")
+api.add_resource(LoginAPI, "/api/login/")
+api.add_resource(SignupAPI, "/api/signup/")
+api.add_resource(trackersAPI, "/api/trackers/view/",
+                 "/api/trackers/create/",
+                 "/api/<int:tracker_id>/update/",
+                 "/api/<int:tracker_id>/delete/")
+api.add_resource(logSpecificAPI, "/api/<int:tracker_id>/details/",
+                 "/api/<int:tracker_id>/log/",
+                 "/api/<int:tracker_id>/<int:log_id>/update/",
+                 "/api/<int:tracker_id>/<int:log_id>/delete/")
+api.add_resource(trackerInfoAPI, "/api/<int:tracker_id>/getLogInfo/")
+api.add_resource(logInfoAPI, "/api/<int:tracker_id>/<int:log_id>/getLogDetails/")
+api.add_resource(ResetPass, "/api/forgot-password/")
+
+# ----------------------------
+
+
+# ----------------------------
+# Running the app
+
+if __name__ == '__main__':
+    app.run(debug=True)
+
+# ----------------------------
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/requirements.txt
+================================================
+Flask
+Flask-SQLAlchemy
+Flask-restful
+Flask-Caching
+flask-cors
+flask-jwt-extended
+celery[redis]
+pdfkit
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/api.py
+================================================
+from flask_restful import Resource, reqparse
+from flask import session, redirect, jsonify
+from .models import *
+from .timestamp import *
+import datetime
+from flask import request, redirect
+from flask import session, url_for
+from flask import current_app as app
+from .controller_index import *
+from .graph import *
+from .to_csv import *
+import matplotlib.pyplot as plt
+import os
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import jwt_required
+from flask_cors import cross_origin
+from .cache_instance import current_cache_inst as cache
+from .ApiFunctions.allApiFunctions import *
+from .celery_tasks import *
+
+
+class LoginAPI(Resource):
+    def post(self):
+
+        login_parser = reqparse.RequestParser()
+
+        # signin parameters added to the parser
+        login_parser.add_argument('username')
+        login_parser.add_argument('password')
+
+        args = login_parser.parse_args()
+        si_un = args.get('username', None).lower()
+        si_ps = args.get('password', None)
+
+        validity = USER.query.filter_by(username=si_un, password=si_ps).first()
+
+        if validity is not None:
+            session['username'] = si_un  # Storing sign-in username in the session!
+
+            # Handling streak for the user
+            streak_data = STREAK.query.filter_by(username=si_un).first()
+            # If difference has '1 day' in it, then ->
+            if '1 day' in str(datetime.datetime.today() - datetime.datetime.strptime(streak_data.date, '%Y-%m-%d')):
+                streak_data.date = datetime.date.today()
+                streak_data.count += 1  # Add 1 to last streak count
+                db.session.commit()
+            # else if difference has 'days' in it, then the streak has been broken. So ->
+            elif 'days' in str(
+                    datetime.datetime.today() - datetime.datetime.strptime(streak_data.date, '%Y-%m-%d')):
+                streak_data.date = datetime.date.today()
+                streak_data.count = 1  # Reset to 1
+                db.session.commit()
+            else:
+                pass
+            access_token = create_access_token(identity=si_un, expires_delta=datetime.timedelta(hours=5))
+            return {"access_token": access_token}, 200  # After updating streak, give success response and token
+
+        elif validity is None:  # If validity fails, give failed response
+            return {"access_token": "Failed"}, 406
+
+
+class SignupAPI(Resource):
+    def post(self):
+        signup_parser = reqparse.RequestParser()
+        # signup parameters added to the parser
+        signup_parser.add_argument('username')
+        signup_parser.add_argument('password')
+        signup_parser.add_argument('email')
+        args = signup_parser.parse_args()
+
+        su_un = args.get("username", None).lower()
+        su_ps = args.get("password", None)
+        su_email = args.get("email", None)
+
+        # Creation_date() function from timestamp.py, returns today's date
+        creation_date = date_today()
+
+        try:  # Try to add a user to the db
+            if su_un.strip() == "":
+                raise Exception("Username can't be empty")
+            new_user = USER(username=su_un, password=su_ps, email=su_email, creation=creation_date)
+            streak_data = STREAK(username=su_un, date=date.today(), count=1)
+            db.session.add(new_user)
+            db.session.add(streak_data)
+            db.session.commit()
+        except:  # if anything fails, it renders the signup page with an error
+            db.session.rollback()  # Roll-back just in case anything was changed
+            return {"signup": "Failed"}, 406
+
+        return {"signup": "Successful"}, 200
+        # it renders the signin/up page with a message saying successful signup
+
+
+class DashboardAPI(Resource):
+    @jwt_required()
+    def get(self):
+        si_un = get_jwt_identity()
+        result = getDashboardDetails(si_un=si_un)  # Cached result
+        return result
+
+
+class trackersAPI(Resource):
+    @jwt_required()
+    def get(self):
+        si_un = get_jwt_identity()
+        results = getTrackerDetails(si_un)  # Cached Results
+        return results
+
+    @jwt_required()
+    def post(self):
+        si_un = get_jwt_identity()
+        # If post request, delete all cache
+        cache.delete_memoized(getDashboardDetails, si_un)
+        cache.delete_memoized(getTrackerDetails, si_un)
+        cache.delete_memoized(getTrackerInfo, si_un)
+        cache.delete_memoized(getLogInfo, si_un)
+
+        if si_un:
+            create_tracker_parser = reqparse.RequestParser()
+            create_tracker_parser.add_argument("tracker_name")
+            create_tracker_parser.add_argument("tracker_type")
+            create_tracker_parser.add_argument("tracker_desc")
+            create_tracker_parser.add_argument("mc_choices")
+            args = create_tracker_parser.parse_args()
+
+            try:
+                tracker_name = args.get("tracker_name", None)
+                tracker_type = args.get("tracker_type", None)
+                tracker_desc = args.get("tracker_desc", None)
+
+                tracker_record = TRACKER(name=tracker_name, description=tracker_desc, type=tracker_type)
+                db.session.add(tracker_record)
+                # db.session.commit()
+
+                if tracker_type == 'mc':
+                    # -----------------------
+                    # When the tracker type is multi choice, add those choices to the MULTI_CHOICE table
+                    # ----------------------
+                    mc_choices = args.get("mc_choices", None)
+
+                    if mc_choices is None:
+                        db.session.rollback()
+                        return {"Creation": "Failed"}, 400
+                    db.session.commit()
+                    mc_record = MULTI_CHOICES(tracker_id=tracker_record.tracker_id, choices=mc_choices)
+                    db.session.add(mc_record)
+
+                db.session.commit()
+
+                # ----------------------
+                # Link the user with the tracker ID in the USER_TRACKER table
+                # ----------------------
+                user_tracker_record = USER_TRACKER(username=si_un, tracker_id=tracker_record.tracker_id)
+
+                db.session.add(user_tracker_record)
+                db.session.commit()
+                return {"creation": "Successful"}
+
+            except:
+                # ----------------------
+                # If by any chance, something goes wrong(on the user or client side), this throws an error!
+                # ----------------------
+                return {"Creation": "Failed"}, 404
+        else:
+            return {"Message": "Failed to perform the action"}, 400
+
+    @jwt_required()
+    def patch(self, tracker_id):
+        si_un = get_jwt_identity()
+        # If patch request, delete all cache
+        cache.delete_memoized(getDashboardDetails, si_un)
+        cache.delete_memoized(getTrackerDetails, si_un)
+        cache.delete_memoized(getLogDetails, si_un, tracker_id)
+        cache.delete_memoized(getTrackerInfo, si_un, tracker_id)
+        cache.delete_memoized(getLogInfo, si_un, tracker_id)
+
+        if si_un:
+
+            choices = ""
+
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+            # if tracker.type == 'mc':
+            #     choices_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).first()
+            #     choices = choices_record.choices.split(",")
+
+            update_tracker_parser = reqparse.RequestParser()
+            update_tracker_parser.add_argument("tracker_name_updated")
+            update_tracker_parser.add_argument("tracker_desc_updated")
+            args = update_tracker_parser.parse_args()
+
+            tracker_name = args.get('tracker_name_updated', None)
+            tracker_desc = args.get('tracker_desc_updated', None)
+
+            print("--------------------------")
+            print("--------------------------")
+            print(f"tracker_name -> {tracker_name}, tracker_desc --> {tracker_desc}")
+            print("--------------------------")
+            print("--------------------------")
+
+            old_record = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+            if tracker_name is not None:
+                old_record.name = tracker_name
+                old_record.description = tracker_desc
+            db.session.commit()
+
+            if tracker_name is None:
+                return {"Update": "Failed"}, 400
+
+            return {"Update": "Successful"}
+
+        else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+            return {"Message": "Login Required"}, 400
+
+    @jwt_required()
+    def delete(self, tracker_id):
+        si_un = get_jwt_identity()
+
+        # If delete request, delete all cache
+        cache.delete_memoized(getDashboardDetails, si_un)
+        cache.delete_memoized(getTrackerDetails, si_un)
+        cache.delete_memoized(getLogDetails, si_un, tracker_id)
+        cache.delete_memoized(getTrackerInfo, si_un, tracker_id)
+        cache.delete_memoized(getLogInfo, si_un, tracker_id)
+
+        if si_un:
+
+            try:
+                tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+                if tracker.type == 'num':
+                    try:
+                        records = TRACKER_NUM.query.filter_by(tracker_id=tracker_id).delete()
+                    except:
+                        pass
+                    user_records = USER_TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+                    tracker = TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+                    db.session.commit()
+
+                elif tracker.type == 'bool':
+                    try:
+                        records = TRACKER_BOOL.query.filter_by(tracker_id=tracker_id).delete()
+                    except:
+                        pass
+                    user_records = USER_TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+                    tracker = TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+                    db.session.commit()
+
+                elif tracker.type == 'mc':
+                    try:
+                        records = TRACKER_MC.query.filter_by(tracker_id=tracker_id).delete()
+                        mc_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).delete()
+                    except:
+                        pass
+                    user_records = USER_TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+                    tracker = TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+                    db.session.commit()
+
+                else:
+                    try:
+                        records = TRACKER_TD.query.filter_by(tracker_id=tracker_id).delete()
+                    except:
+                        pass
+                    user_records = USER_TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+                    tracker = TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+                    db.session.commit()
+
+                return {"Deletion": "Successful"}
+            except:
+                return {"Deletion": "Failed"}, 400
+
+        else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+            return {"message": "Login required."}, 400
+
+
+class logSpecificAPI(Resource):
+    @jwt_required()
+    def get(self, tracker_id):
+        si_un = get_jwt_identity()
+        results = getLogDetails(si_un, tracker_id)  # Cached results
+        return results
+
+    @jwt_required()
+    def post(self, tracker_id):
+        si_un = get_jwt_identity()
+
+        # If post request, delete all cache
+        cache.delete_memoized(getDashboardDetails, si_un)
+        cache.delete_memoized(getTrackerDetails, si_un)
+        cache.delete_memoized(getLogDetails, si_un, tracker_id)
+        cache.delete_memoized(getTrackerInfo, si_un, tracker_id)
+        cache.delete_memoized(getLogInfo, si_un, tracker_id)
+        if si_un:
+            add_log_parser = reqparse.RequestParser()
+            add_log_parser.add_argument("note")
+            add_log_parser.add_argument("timestamp")
+            add_log_parser.add_argument("value")
+            add_log_parser.add_argument("start_val")
+            add_log_parser.add_argument("end_val")
+            add_log_parser.add_argument("choice_list")
+            args = add_log_parser.parse_args()
+
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+            timestamp = args.get('timestamp', None)
+            note = args.get('note', None)
+
+            if tracker.type == 'num':
+                tracker_value = args.get('value')
+                if note is not None:
+                    record = TRACKER_NUM(tracker_id=tracker_id, timestamp=timestamp,
+                                         value=tracker_value, note=note)
+                else:
+                    record = TRACKER_NUM(tracker_id=tracker_id, timestamp=timestamp,
+                                         value=tracker_value)
+                db.session.add(record)
+                db.session.commit()
+
+            elif tracker.type == 'time_dur':
+                tracker_value_start = args.get('start_val')
+                tracker_value_end = args.get('end_val')
+                if note is not None:
+                    record = TRACKER_TD(tracker_id=tracker_id, timestamp=timestamp,
+                                        note=note, time_start=tracker_value_start,
+                                        time_end=tracker_value_end)
+                else:
+                    record = TRACKER_TD(tracker_id=tracker_id, timestamp=timestamp,
+                                        time_start=tracker_value_start,
+                                        time_end=tracker_value_end)
+                db.session.add(record)
+                db.session.commit()
+
+            elif tracker.type == 'bool':
+                tracker_value = args.get('value')
+                if note is not None:
+                    record = TRACKER_BOOL(tracker_id=tracker_id, timestamp=timestamp,
+                                          value=tracker_value, note=note)
+                else:
+                    record = TRACKER_NUM(tracker_id=tracker_id, timestamp=timestamp,
+                                         value=tracker_value)
+                db.session.add(record)
+                db.session.commit()
+
+            elif tracker.type == 'mc':
+                # tracker_values_list = args.get('choice_list').split(",")
+                tracker_value = args.get('choice_list')
+
+                # for i in range(len(tracker_values_list)):
+                #     if i != len(tracker_values_list) - 1:
+                #         tracker_value += str(tracker_values_list[i]) + ","
+                #     else:
+                #         tracker_value += str(tracker_values_list[i])
+
+                if note is not None:
+                    record = TRACKER_MC(tracker_id=tracker_id, timestamp=timestamp,
+                                        value=tracker_value, note=note)
+                else:
+                    record = TRACKER_NUM(tracker_id=tracker_id, timestamp=timestamp,
+                                         value=tracker_value)
+                db.session.add(record)
+                db.session.commit()
+            tracker.last_log = timestamp
+            db.session.commit()
+
+            return {"Logging": "Successful"}
+
+        else:
+            return {"Message": "Login required."}, 400
+
+    @jwt_required()
+    def patch(self, tracker_id, log_id):
+        si_un = get_jwt_identity()
+
+        # If patch request, delete all cache
+        cache.delete_memoized(getDashboardDetails, si_un)
+        cache.delete_memoized(getTrackerDetails, si_un)
+        cache.delete_memoized(getLogDetails, si_un, tracker_id)
+        cache.delete_memoized(getTrackerInfo, si_un, tracker_id)
+        cache.delete_memoized(getLogInfo, si_un, tracker_id)
+        if si_un:
+
+            update_log_parser = reqparse.RequestParser()
+            update_log_parser.add_argument("note")
+            update_log_parser.add_argument("timestamp")
+            update_log_parser.add_argument("value")
+            update_log_parser.add_argument("start_val")
+            update_log_parser.add_argument("end_val")
+            update_log_parser.add_argument("choice_list")
+            args = update_log_parser.parse_args()
+
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+
+            tracker_timestamp_update = args.get('timestamp', None)
+            note_update = args.get('note', None)
+
+            if tracker.type == 'num':
+                log = TRACKER_NUM.query.filter_by(log_id=log_id).first()
+
+            elif tracker.type == 'bool':
+                log = TRACKER_BOOL.query.filter_by(log_id=log_id).first()
+
+            elif tracker.type == 'time_dur':
+                log = TRACKER_TD.query.filter_by(log_id=log_id).first()
+
+            elif tracker.type == 'mc':
+                log = TRACKER_MC.query.filter_by(log_id=log_id).first()
+
+                choices_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).first()
+                choices = choices_record.choices.split(",")
+                choices_marked_record = TRACKER_MC.query.filter_by(log_id=log_id).first()
+                choices_marked = choices_marked_record.value.split(",")
+
+            # -----------
+
+            if tracker.type == 'time_dur':
+                tracker_value_start_update = args.get('start_val', None)
+                tracker_value_end_update = args.get('end_val', None)
+
+                log.time_start = tracker_value_start_update
+                log.time_end = tracker_value_end_update
+                log.note = note_update
+                log.timestamp = tracker_timestamp_update
+                db.session.commit()
+
+            elif tracker.type == 'mc':
+                tracker_values_update_list = args.get('choice_list')
+
+
+
+                log.value = tracker_values_update_list
+                log.timestamp = tracker_timestamp_update
+                log.note = note_update
+                db.session.commit()
+                db.session.commit()
+
+            else:
+                tracker_value_update = args.get('value')
+
+                log.value = tracker_value_update
+                log.timestamp = tracker_timestamp_update
+                log.note = note_update
+                db.session.commit()
+
+            return {"Update": "Successful"}
+
+        else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+            return {"Message": "Login required."}, 400
+
+    @jwt_required()
+    def delete(self, tracker_id, log_id):
+
+        si_un = get_jwt_identity()
+
+        # If delete request, delete all cache
+        cache.delete_memoized(getDashboardDetails, si_un)
+        cache.delete_memoized(getTrackerDetails, si_un)
+        cache.delete_memoized(getLogDetails, si_un, tracker_id)
+        cache.delete_memoized(getTrackerInfo, si_un, tracker_id)
+        cache.delete_memoized(getLogInfo, si_un, tracker_id)
+        if si_un:
+
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+            if tracker.type == 'num':
+                log = TRACKER_NUM.query.filter_by(log_id=log_id).delete()
+
+            elif tracker.type == 'bool':
+                log = TRACKER_BOOL.query.filter_by(log_id=log_id).delete()
+
+            elif tracker.type == 'time_dur':
+                log = TRACKER_TD.query.filter_by(log_id=log_id).delete()
+
+            elif tracker.type == 'mc':
+                log = TRACKER_MC.query.filter_by(log_id=log_id).delete()
+
+            db.session.commit()
+
+            return {"Delete": "Successful"}
+
+        else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+            return {"Message": "Login required."}, 400
+
+
+class trackerInfoAPI(Resource):
+    @jwt_required()
+    def get(self, tracker_id):
+        si_un = get_jwt_identity()
+        results = getTrackerInfo(si_un, tracker_id)  # Cached results
+        return results
+
+
+class logInfoAPI(Resource):
+    @jwt_required()
+    def get(self, tracker_id, log_id):
+        si_un = get_jwt_identity()
+        results = getLogInfo(si_un, tracker_id, log_id)
+        return results
+
+
+# ----------------------
+# to reset the password
+# ----------------------
+class ResetPass(Resource):
+    def get(self):
+        return {"msg": "working"}
+
+    def post(self):
+        forgetPass = reqparse.RequestParser()
+        forgetPass.add_argument("username")
+        args = forgetPass.parse_args()
+
+        username = args.get("username", None).lower()
+
+        forgotPassTASK.delay(username)
+
+        return {"msg": "Done"}, 200
+
+
+
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/cache_instance.py
+================================================
+from flask_caching import Cache
+from flask import current_app as app
+
+
+def make_cache():
+    cache_mapping = {
+        "CACHE_TYPE": "RedisCache",
+        "CACHE_REDIS_HOST": "localhost",
+        "CACHE_REDIS_PORT": 6379
+    }
+
+    app.config.from_mapping(cache_mapping)  # Setup Redis Cache
+
+    cache = Cache(app)  # cache instance
+    app.app_context().push()
+
+    return cache
+
+
+current_cache_inst = make_cache()
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/celery_tasks.py
+================================================
+import time
+from flask import session, redirect
+import os
+from .timestamp import *
+from .models import *
+from .to_csv import *
+from celery import current_app as celery_inst
+from .mail import *
+from celery.schedules import crontab
+from jinja2 import Template
+from .monthly_report import *
+from .graph import *
+
+celery_inst.set_current()
+
+
+@celery_inst.on_after_finalize.connect
+def setup_intervalTASK(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab(minute=30, hour=17),  # Send a remainder every day at5.30pm IST
+        send_remainder.s(), name="daily at 5:30pm"
+    )
+
+    sender.add_periodic_task(
+        crontab(minute=30, hour=17, day_of_month=1),  # Send the monthly report every month at5.30pm IST
+        monthly_report.s(),
+        name="Monthly Report"
+    )
+
+
+@celery_inst.task()
+def download_logsTASK(tracker_id, si_un=None):
+    if si_un is not None:
+        logs = None
+        try:
+
+            to_email = USER.query.filter_by(username=si_un).first().email
+
+            tracker_type = TRACKER.query.filter_by(tracker_id=tracker_id).first().type
+            if tracker_type == 'num':
+                logs = TRACKER_NUM.query.filter_by(tracker_id=tracker_id).all()
+
+            elif tracker_type == 'bool':
+                logs = TRACKER_BOOL.query.filter_by(tracker_id=tracker_id).all()
+
+            elif tracker_type == 'time_dur':
+                logs = TRACKER_TD.query.filter_by(tracker_id=tracker_id).all()
+
+            elif tracker_type == 'mc':
+                logs = TRACKER_MC.query.filter_by(tracker_id=tracker_id).all()
+
+            filepath = log_export(tracker_type, logs)
+
+            with open(r"templates/email_templates/download_ready.html") as file:
+                temp = Template(file.read())
+
+            sub = "[LOGS DOWNLOAD READY] LYF-RECORD: QUANTIFIED-SELF APP"
+            message = temp.render(user=si_un, file_type="LOGS DATA")
+            send_email(to=to_email, subject=sub, msg=message, attachment=filepath)
+
+            return {"msg": "Successful"}, 200
+
+        except:
+            return {"msg": "Failed1"}
+    else:
+        return {"msg": "Failed2"}
+
+
+@celery_inst.task()
+def download_trackersTASK(tracker_list, si_un=None):
+    if si_un is not None:
+        to_email = USER.query.filter_by(username=si_un).first().email
+        filepath = tracker_export(tracker_list)
+
+        with open(r"templates/email_templates/download_ready.html") as file:
+            temp = Template(file.read())
+
+        sub = "[TRACKERS DOWNLOAD READY] LYF-RECORD: QUANTIFIED-SELF APP"
+        message = temp.render(user=si_un, file_type="TRACKERS DATA")
+        send_email(to=to_email, subject=sub, msg=message, attachment=filepath)
+
+        return {"msg": "Successful"}
+    else:
+        return {"msg": "Failed"}
+
+
+@celery_inst.task()
+def send_remainder():
+    users = USER.query.all()
+    user_email = {user.username: [user.email, user.last_log] for user in users}
+    send_reminder_to = {}
+
+    today = current_timestamp()[:current_timestamp().index("T")]
+
+    for k, v in user_email.items():
+        if v[1].find(today) == -1:  # If the value was not logged today
+            send_reminder_to[k] = v[0]
+
+    # send_reminder_to now contains all the users who did not log to any tracker today.
+
+    with open(r"templates/email_templates/daily_reminder.html") as file:
+        temp = Template(file.read())
+
+    for user, email_id in send_reminder_to.items():
+        message = temp.render(user=user)
+        sub = f"[REMAINDER] LYF-RECORD: QUANTIFIED-SELF APP"
+        send_email(email_id, subject=sub, msg=message)
+
+    return {"msg": "Successful"}
+
+
+@celery_inst.task()
+def monthly_report():
+    users = USER.query.all()
+    user_email = {user.username: user.email for user in users}
+
+    with open(r"templates/email_templates/report_mail_temp.html") as file:
+        msg_temp = Template(file.read())
+
+    with open(r"templates/email_templates/report.html") as file:
+        pdf_temp = Template(file.read())
+
+    today = date_today().strftime('%Y-%m-%d')
+    month = date_today().strftime("%B")
+
+    done_users = []
+
+    for user_obj in users:
+        user = user_obj.username
+        account_details = accountDetails(user)  # Function returns all required account details
+        tracker_details = trackerDetails(user)  # Function returns a list of all trackers for the user
+        all_logs = logDetails(user)
+        message = msg_temp.render(user=user)
+        pdf_html = pdf_temp.render(today=str(today),
+                                   month=month,
+                                   account_details=account_details,
+                                   tracker_details=tracker_details,
+                                   all_logs=all_logs,
+                                   username=user
+                                   )
+
+        sub = f"[MONTHLY REPORT] LYF-RECORD: QUANTIFIED-SELF APP"
+
+        if user not in done_users:
+            pdf_path = generate_pdf(usr=user, template=pdf_html)
+            send_email(to=user_obj.email, subject=sub, msg=message, attachment=pdf_path)
+            done_users.append(user)
+
+        print(f"------MONTHLY REPORT SENT FOR {user}---------")
+
+
+@celery_inst.task()
+def forgotPassTASK(si_un=None):
+    if si_un is not None:
+        try:
+            to_email = USER.query.filter_by(username=si_un).first().email
+            password = USER.query.filter_by(username=si_un).first().password
+
+            with open(r"templates/email_templates/forgot_pass.html") as file:
+                forgot_pass_temp = Template(file.read())
+
+            message = forgot_pass_temp.render(user=si_un, password=password)
+
+            sub = f"[FORGOT PASSWORD] LYF-RECORD: QUANTIFIED-SELF APP"
+
+            send_email(to=to_email, subject=sub, msg=message)
+
+            print(f"------FORGOT PASSWORD MAIL SENT---------")
+        except AttributeError:
+            print(f"------MAIL NOT SENT FOR {si_un}. ATTRIBUTE ERROR---------")
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/controller_celery.py
+================================================
+import time
+from flask import current_app as app, url_for
+from .models import *
+from .controller_index import *
+from .controller_dash import *
+from .graph import *
+from .timestamp import *
+from .to_csv import *
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from .celery_tasks import *
+from .cache_instance import current_cache_inst as cache
+from jinja2 import Template
+
+'''
+This particular .py file contains the api calls without using resources.
+Here, we can find various sorts of Async tasks that can be called, ofc, asynchronously.
+
+'''
+
+
+# ----------------------
+# to download logs
+# ----------------------
+
+
+@app.route("/api/<int:tracker_id>/details/download/")
+@jwt_required()
+@cache.memoize(timeout=25)  # So that the user doesn't spam the download button
+def logDownload(tracker_id):
+    username = get_jwt_identity()
+    download_logsTASK.delay(tracker_id, username)
+    return {'msg': "Done"}, 200
+
+
+# ----------------------
+# to download trackers
+# ----------------------
+@app.route("/api/trackers/download/")
+@jwt_required()
+@cache.memoize(timeout=25)  # So that the user doesn't spam the download button
+def trackersDownload():
+    si_un = get_jwt_identity()
+    trackers = USER_TRACKER.query.filter_by(username=si_un)
+    trackers_list = []
+    for i in trackers:
+        trackers_list.append(i.tracker_id)
+
+    download_trackersTASK.delay(trackers_list, si_un)
+
+    return {'msg': "Done"}, 200
+
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/controller_dash.py
+================================================
+from flask import render_template
+from flask import request, redirect
+from flask import session, url_for
+from flask import current_app as app
+from .models import *
+from .controller_index import *
+from .graph import *
+from .timestamp import *
+import matplotlib.pyplot as plt
+from .to_csv import *
+import os
+import datetime
+
+
+from flask_jwt_extended import get_jwt_identity
+from flask_jwt_extended import jwt_required
+from flask import jsonify
+'''
+This file contains all the dashboard related actions!
+from signin to signout, from viewing trackers to deleting them
+from adding logs to deleting them, everything!
+
+'''
+
+
+@app.route("/signin-up/", methods=['GET', 'POST'])
+def signin_up():  # A function to signin or sign up the user. Streak count, sessions are maintained here.
+    if request.method == 'GET':  # displays the signin/up page or redirects to the dashbaord.
+        if "username" in session:
+            return redirect("/dashboard/")
+        return render_template("signup.html")
+    if request.method == 'POST':  # If POST, then either signs in or signs up the user, according to the details received.
+        try:  # Trying to sign in
+            si_un = request.form['si_un'].lower()
+            si_ps = request.form['si_ps']
+            validity = USER.query.filter_by(username=si_un, password=si_ps).first()
+
+            if validity is not None:
+                session['username'] = si_un  # Storing sign-in username in the session!
+
+                # Handling streak for the user
+                streak_data = STREAK.query.filter_by(username=si_un).first()
+                # If difference has '1 day' in it, then ->
+                if '1 day' in str(datetime.datetime.today() - datetime.datetime.strptime(streak_data.date, '%Y-%m-%d')):
+                    streak_data.date = datetime.date.today()
+                    streak_data.count += 1  # Add 1 to last streak count
+                    db.session.commit()
+                # else if difference has 'days' in it, then the streak has been broken. So ->
+                elif 'days' in str(
+                        datetime.datetime.today() - datetime.datetime.strptime(streak_data.date, '%Y-%m-%d')):
+                    streak_data.date = datetime.date.today()
+                    streak_data.count = 1  # Reset to 1
+                    db.session.commit()
+                else:
+                    pass
+
+                return redirect("/dashboard/")  # After updating streak, redirect to the dashboard
+
+            elif validity is None:  # If validity fails, render signin-up page with error message
+                return render_template('signup.html', error="Incorrect")
+
+        except:  # else, it retrieves the sign-up information.
+            su_un = request.form['su_un'].lower()
+            su_ps = request.form['su_ps']
+            su_email = request.form['su_email']
+
+            # Creation_date() function from timestamp.py, returns today's date
+            creation_date = date_today()
+
+            try:  # Try to add a user to the db
+                new_user = USER(username=su_un, password=su_ps, email=su_email, creation=creation_date)
+                streak_data = STREAK(username=su_un, date=date.today(), count=1)
+                db.session.add(new_user)
+                db.session.add(streak_data)
+                db.session.commit()
+            except:  # if anything fails, it renders the signup page with an error
+                db.session.rollback()  # Roll-back just in case anything was changed
+                return render_template('signup.html', error='failed')
+
+            return render_template('signup.html', error='success')  # at last, if everything works,
+            # it renders the signin/up page with a message saying successful signup
+
+
+@app.route("/dashboard/", methods=['GET'])
+def dashboard(): # Renders the dashboard according to the session.
+    if "username" in session:
+        si_un = session['username']
+        # Streak count ->
+        streak = STREAK.query.filter_by(username=si_un).first().count
+        # ----------------------
+
+        # Tracker count ->
+        trackers = USER_TRACKER.query.filter_by(username=si_un).distinct()
+        tracker_count = 0
+        for i in trackers:
+            tracker_count += 1
+        # ----------------------
+
+        # member since ->
+        member_create = USER.query.filter_by(username=si_un).first()
+        member_since = str(datetime.datetime.today() - datetime.datetime.strptime(member_create.creation, '%Y-%m-%d'))
+        member_since = member_since.split(",")
+        member_since = member_since[0]
+        # ----------------------
+
+        # List of trackers ->
+        tracker_ids = USER_TRACKER.query.filter_by(username=si_un).distinct()
+        trackers = []
+        for t_id in tracker_ids:
+            trackers.append(TRACKER.query.filter_by(tracker_id=t_id.tracker_id).first())
+        # ----------------------
+
+        # Trend line graph ->
+        filename_path = plot_homepage(si_un=si_un)  # Function from graph.py
+        # ----------------------
+        return render_template("dashboard.html", user=si_un, streak=streak, tracker_count=tracker_count,
+                               member_since=member_since, trackers=trackers, filename_path=filename_path)
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect('/signin-up/')
+
+
+@app.route("/view_trackers/", methods=['GET'])
+def view_trackers():
+    # ----------------------
+    # shows all the trackers with their details at the mentioned URI.
+    # Filters the trackers according to the username(sign in user-name)
+    # ----------------------
+    if "username" in session:
+        si_un = session['username']
+        tracker_ids = USER_TRACKER.query.filter_by(username=si_un).distinct()
+        trackers = []
+        for tid in tracker_ids:
+            trackers.append(TRACKER.query.filter_by(tracker_id=tid.tracker_id).first())
+
+        return render_template("view_trackers.html", trackers=trackers, user=si_un)
+    else:
+        return redirect('/signin-up/')
+
+
+@app.route("/create/", methods=['GET', 'POST'])
+def create_tracker():
+    # ----------------------
+    # Creates a new tracker.
+    # uses GET and POST methods.
+    # ----------------------
+    if "username" in session:
+        si_un = session['username']
+
+        if request.method == 'GET':
+            return render_template("add_tracker.html", user=si_un)
+
+        if request.method == 'POST':
+            try:
+                tracker_name = request.form['tracker_name']
+                tracker_type = request.form['tracker_type']
+                tracker_desc = request.form['tracker_desc']
+
+                tracker_record = TRACKER(name=tracker_name, description=tracker_desc, type=tracker_type)
+                db.session.add(tracker_record)
+                db.session.commit()
+
+                if tracker_type == 'mc':
+                    # ----------------------
+                    # When the tracker type is multi choice, add those choices to the MULTI_CHOICE table
+                    # ----------------------
+                    mc_choices = request.form['mc_choices']
+                    mc_record = MULTI_CHOICES(tracker_id=tracker_record.tracker_id, choices=mc_choices)
+                    db.session.add(mc_record)
+
+                # ----------------------
+                # Link the user with the tracker ID in the USER_TRACKER table
+                # ----------------------
+                user_tracker_record = USER_TRACKER(username=si_un, tracker_id=tracker_record.tracker_id)
+
+                db.session.add(user_tracker_record)
+                db.session.commit()
+            except:
+                # ----------------------
+                # If by any chance, something goes wrong(on the user or client side), this throws an error!
+                # ----------------------
+                return render_template("add_tracker.html", error='Incorrect', user=si_un)
+
+            return redirect("/dashboard/")
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up/")
+
+
+@app.route("/<string:tracker_id>/log/", methods=['GET', 'POST'])
+def add_log(tracker_id):
+    # ----------------------
+    # adding a log to the tracker!
+    # ----------------------
+    if "username" in session:
+        si_un = session['username']
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+        choices = None
+        if tracker.type == 'mc':
+            choices_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).first()
+            choices = choices_record.choices.split(",")
+        if request.method == 'GET':
+            return render_template("add_log.html", tracker_id=tracker_id, tracker=tracker, choices=choices, user=si_un,
+                                   time_value=current_timestamp())
+
+        elif request.method == 'POST':
+            note = None
+            timestamp = request.form['tracker_timestamp']
+            note = request.form['note']
+
+            if tracker.type == 'num':
+                tracker_value = request.form['tracker_value']
+                if note is not None:
+                    record = TRACKER_NUM(tracker_id=tracker_id, timestamp=timestamp,
+                                         value=tracker_value, note=note)
+                else:
+                    record = TRACKER_NUM(tracker_id=tracker_id, timestamp=timestamp,
+                                         value=tracker_value)
+                db.session.add(record)
+                db.session.commit()
+
+            elif tracker.type == 'time_dur':
+                tracker_value_start = request.form['tracker_value_start']
+                tracker_value_end = request.form['tracker_value_end']
+                if note is not None:
+                    record = TRACKER_TD(tracker_id=tracker_id, timestamp=timestamp,
+                                        note=note, time_start=tracker_value_start,
+                                        time_end=tracker_value_end)
+                else:
+                    record = TRACKER_TD(tracker_id=tracker_id, timestamp=timestamp,
+                                        time_start=tracker_value_start,
+                                        time_end=tracker_value_end)
+                db.session.add(record)
+                db.session.commit()
+
+            elif tracker.type == 'bool':
+                tracker_value = request.form['tracker_value']
+                if note is not None:
+                    record = TRACKER_BOOL(tracker_id=tracker_id, timestamp=timestamp,
+                                          value=tracker_value, note=note)
+                else:
+                    record = TRACKER_NUM(tracker_id=tracker_id, timestamp=timestamp,
+                                         value=tracker_value)
+                db.session.add(record)
+                db.session.commit()
+
+            elif tracker.type == 'mc':
+                tracker_values_list = request.form.getlist('tracker_value')
+                tracker_value = ""
+                for i in range(len(tracker_values_list)):
+                    if i != len(tracker_values_list) - 1:
+                        tracker_value += str(tracker_values_list[i]) + ","
+                    else:
+                        tracker_value += str(tracker_values_list[i])
+
+                if note is not None:
+                    record = TRACKER_MC(tracker_id=tracker_id, timestamp=timestamp,
+                                        value=tracker_value, note=note)
+                else:
+                    record = TRACKER_NUM(tracker_id=tracker_id, timestamp=timestamp,
+                                         value=tracker_value)
+                db.session.add(record)
+                db.session.commit()
+            tracker.last_log = timestamp
+            user = USER.query.filter_by(username=si_un).first()
+            user.last_log = timestamp
+            db.session.commit()
+
+            return redirect("/dashboard/")
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up/")
+
+
+@app.route("/<string:tracker_id>/update/", methods=['GET', 'POST'])
+def update_tracker(tracker_id):
+    # ----------------------
+    # updating the tracker
+    # ----------------------
+    if "username" in session:
+        si_un = session['username']
+        choices = ""
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+        if tracker.type == 'mc':
+            choices_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).first()
+            choices = choices_record.choices.split(",")
+
+        if request.method == 'GET':
+            return render_template("update_tracker.html", user=si_un, tracker=tracker, choices=choices)
+
+        elif request.method == 'POST':
+            try:
+                tracker_name = request.form['tracker_name_updated']
+                tracker_desc = request.form['tracker_desc_updated']
+
+                old_record = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+                old_record.name = tracker_name
+                old_record.description = tracker_desc
+                db.session.commit()
+            except:
+                return render_template("update_tracker.html", error='Incorrect', user=si_un)
+            return redirect("/dashboard/")
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up/")
+
+
+# ----------------------
+# deleting the tracker
+# ----------------------
+@app.route("/<string:tracker_id>/delete/", methods=['GET'])
+def delete_tracker(tracker_id):
+    if "username" in session:
+        si_un = session['username']
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+        if tracker.type == 'num':
+            try:
+                records = TRACKER_NUM.query.filter_by(tracker_id=tracker_id).delete()
+            except:
+                pass
+            user_records = USER_TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+            db.session.commit()
+
+        elif tracker.type == 'bool':
+            try:
+                records = TRACKER_BOOL.query.filter_by(tracker_id=tracker_id).delete()
+            except:
+                pass
+            user_records = USER_TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+            db.session.commit()
+
+        elif tracker.type == 'mc':
+            try:
+                records = TRACKER_MC.query.filter_by(tracker_id=tracker_id).delete()
+                mc_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).delete()
+            except:
+                pass
+            user_records = USER_TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+            db.session.commit()
+
+        else:
+            try:
+                records = TRACKER_TD.query.filter_by(tracker_id=tracker_id).delete()
+            except:
+                pass
+            user_records = USER_TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).delete()
+            db.session.commit()
+        # plot_homepage(si_un=si_un)
+        return redirect("/dashboard/")
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up")
+
+
+# ----------------------
+# Shows the tracker details.
+# ----------------------
+@app.route("/<int:tracker_id>/details/")
+def tracker_details(tracker_id):
+    if "username" in session:
+        si_un = session['username']
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+
+        if tracker.type == 'num':
+            logs = TRACKER_NUM.query.filter_by(tracker_id=tracker_id).all()
+            filename_path = plot_numTracker(tracker_id, logs)
+
+        elif tracker.type == 'bool':
+            logs = TRACKER_BOOL.query.filter_by(tracker_id=tracker_id).all()
+            filename_path = plot_BoolTracker(tracker_id, logs)
+
+        elif tracker.type == 'time_dur':
+            logs = TRACKER_TD.query.filter_by(tracker_id=tracker_id).all()
+            filename_path = plot_tdTracker(tracker_id, logs)
+
+        elif tracker.type == 'mc':
+            logs = TRACKER_MC.query.filter_by(tracker_id=tracker_id).all()
+            filename_path = plot_mcTracker(tracker_id, logs)
+
+        return render_template("view_tracker.html", logs=logs, tracker=tracker, user=si_un, filename_path=filename_path)
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up")
+
+
+# ----------------------
+# Updates the log
+# ----------------------
+@app.route("/<int:tracker_id>/<int:log_id>/update/", methods=['GET', 'POST'])
+def update_log(log_id, tracker_id):
+    if "username" in session:
+        si_un = session['username']
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+        choices = None
+        choices_marked = None
+
+        if tracker.type == 'num':
+            log = TRACKER_NUM.query.filter_by(log_id=log_id).first()
+            logs = TRACKER_NUM.query.filter_by(tracker_id=tracker_id).all()
+
+        elif tracker.type == 'bool':
+            log = TRACKER_BOOL.query.filter_by(log_id=log_id).first()
+            logs = TRACKER_BOOL.query.filter_by(tracker_id=tracker_id).all()
+
+        elif tracker.type == 'time_dur':
+            log = TRACKER_TD.query.filter_by(log_id=log_id).first()
+            logs = TRACKER_TD.query.filter_by(tracker_id=tracker_id).all()
+
+        elif tracker.type == 'mc':
+            log = TRACKER_MC.query.filter_by(log_id=log_id).first()
+            logs = TRACKER_MC.query.filter_by(tracker_id=tracker_id).all()
+
+            choices_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).first()
+            choices = choices_record.choices.split(",")
+            choices_marked_record = TRACKER_MC.query.filter_by(log_id=log_id).first()
+            choices_marked = choices_marked_record.value.split(",")
+
+        if request.method == 'GET':
+            return render_template("update_log.html", tracker=tracker, log=log, choices=choices,
+                                   choices_marked=choices_marked, user=si_un)
+
+        if request.method == 'POST':
+            tracker_timestamp_update = request.form['tracker_timestamp_update']
+
+            if tracker.type == 'time_dur':
+                tracker_value_start_update = request.form['tracker_value_start_update']
+                tracker_value_end_update = request.form['tracker_value_end_update']
+                note_update = request.form['note_update']
+
+                log.time_start = tracker_value_start_update
+                log.time_end = tracker_value_end_update
+                log.note = note_update
+                log.timestamp = tracker_timestamp_update
+                db.session.commit()
+
+            elif tracker.type == 'mc':
+                tracker_values_update_list = request.form.getlist('tracker_value_update')
+                print("-----------")
+                print(tracker_values_update_list)
+                print("-----------")
+                note_update = request.form['note_update']
+                tracker_value_update = ""
+                for i in range(len(tracker_values_update_list)):
+                    if i != len(tracker_values_update_list) - 1:
+                        tracker_value_update += str(tracker_values_update_list[i]) + ","
+                    else:
+                        tracker_value_update += str(tracker_values_update_list[i])
+                print("-----------")
+                print(note_update)
+                print("-----------")
+                log.value = tracker_value_update
+                log.timestamp = tracker_timestamp_update
+                log.note = note_update
+                db.session.commit()
+                db.session.commit()
+
+            else:
+                tracker_value_update = request.form['tracker_value_update']
+                note_update = request.form['note_update']
+
+                log.value = tracker_value_update
+                log.timestamp = tracker_timestamp_update
+                log.note = note_update
+                db.session.commit()
+            path_to_details = '/{tracker_id}/details/'.format(tracker_id=tracker_id)
+            return redirect(path_to_details)
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up")
+
+
+# ----------------------
+# To delete any log that the user has logged before
+# ----------------------
+@app.route("/<int:tracker_id>/<int:log_id>/delete/", methods=['GET'])
+def delete_log(tracker_id, log_id):
+    if "username" in session:
+        si_un = session['username']
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+        if tracker.type == 'num':
+            log = TRACKER_NUM.query.filter_by(log_id=log_id).delete()
+
+        elif tracker.type == 'bool':
+            log = TRACKER_BOOL.query.filter_by(log_id=log_id).delete()
+
+        elif tracker.type == 'time_dur':
+            log = TRACKER_TD.query.filter_by(log_id=log_id).delete()
+
+        elif tracker.type == 'mc':
+            log = TRACKER_MC.query.filter_by(log_id=log_id).delete()
+
+        db.session.commit()
+        path_to_details = '/{tracker_id}/details/'.format(tracker_id=tracker_id)
+        return redirect(path_to_details)
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up")
+
+
+@app.route("/log_error/")
+def log_error():
+    if "username" in session:
+        return render_template("dashboard.html", log_error='true')
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up/")
+
+# ----------------------
+# Finally, to sign out
+# ----------------------
+@app.route("/signout/", methods=['GET'])
+def signout():
+    if "username" in session:
+        si_un = session['username']
+        session.pop("username", None)
+        return render_template("signup.html", signout='true')
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return redirect("/signin-up/")
+
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/controller_index.py
+================================================
+from flask import render_template
+from flask import current_app as app
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
+'''
+# Code to generate random secret_key. Was randomly generating the secret key so that it doesn't redirect to the dashboard 
+import random
+import string
+
+app.secret_key = ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(25))
+'''
+
+# Secret key for session
+app.secret_key = "sdivjbfiurnvsdivjbhuulvdkfvfd"
+app.config["JWT_SECRET_KEY"] = "vnfeiuerblaseiondfboefubnersd"
+
+
+# Below are the functions to render html templates on the homepage.
+@app.route("/")
+def index():
+    return render_template("index.html")
+
+
+@app.route("/About/")
+def about():
+    return render_template("About.html")
+
+
+@app.route("/credits/")
+def credit():
+    return render_template("credits.html")
+
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/database.py
+================================================
+from flask_sqlalchemy import SQLAlchemy
+
+# Creating a database variable to communicate with the database file! Using SQLAlchemy ORM for it
+db = SQLAlchemy()
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/graph.py
+================================================
+import matplotlib
+import matplotlib.pyplot as plt
+from .models import *
+from .timestamp import *
+'''
+Here are all the functions used to plot the graph and save them in png format in the static/images/ folder
+Used matplotlib to do so.
+graphs mainly include line plot, bar graphs, scatter plots.
+'''
+matplotlib.use('Agg')
+
+
+def plot_homepage(si_un):
+    user_trackers = USER_TRACKER.query.filter_by(username=si_un).all()
+    num_count, bool_count, td_count, mc_count = 0, 0, 0, 0
+    for i in user_trackers:
+        trackers = TRACKER.query.filter_by(tracker_id=i.tracker_id).all()
+        for tracker in trackers:
+            if tracker.type == 'bool':
+                bool_count += 1
+            elif tracker.type == 'num':
+                num_count += 1
+            elif tracker.type == 'time_dur':
+                td_count += 1
+            elif tracker.type == 'mc':
+                mc_count += 1
+    x = ["num", "bool", "time_dur", "mc"]
+    y = [num_count, bool_count, td_count, mc_count]
+    c = ['magenta', '#38b6ff', 'teal', 'orange']
+    x_label = plt.xlabel("Tracker Types")
+    y_label = plt.ylabel("Number of trackers")
+    title = plt.title("Summary of your Trackers")
+
+    y_range = [i for i in range(0, 100)]
+    plt.yticks(y_range)
+    fig = plt.bar(x, y, color=c)
+    filename_path = "static/images/homepage_" + str(si_un) + ".png"
+    plt.savefig(filename_path)
+    plt.close()
+
+    return filename_path
+
+
+def plot_numTracker(tracker_id, logs):
+    x_list = []
+    y_list = []
+    values = {}
+    for log in logs:
+        datetime_obj = convert_datetime(log.timestamp)
+        values[datetime_obj] = log.value
+
+    for key in sorted(values):
+        x_list.append(key)
+        y_list.append(values[key])
+
+    x_label = plt.xlabel("TIMESTAMP")
+    y_label = plt.ylabel("VALUE LOGGED")
+    title = plt.title("Summary of your Logs")
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    fig = plt.plot(x_list, y_list, color='red')
+    filename_path = "static/images/num_tracker_" + str(tracker_id) + ".png"
+    plt.savefig(filename_path)
+    plt.close()
+
+    return filename_path
+
+
+def plot_BoolTracker(tracker_id, logs):
+
+    true_count = 0
+    false_count = 0
+    scatter_x = []
+    scatter_y = []
+    for log in logs:
+        datetime_obj = convert_datetime(log.timestamp)
+        scatter_x.append(datetime_obj)
+        scatter_y.append(log.value)
+
+        if log.value == 'True':
+            true_count += 1
+
+        elif log.value == 'False':
+            false_count += 1
+
+    x_list = ["True", "False"]
+    y_list = [true_count, false_count]
+
+    x_label = plt.xlabel("Value")
+    y_label = plt.ylabel("Frequency")
+    title = plt.title("Summary of your Logs")
+
+    plt.subplot(2, 1, 1)
+    y_range = [i for i in range(0, 100)]
+    plt.yticks(y_range)
+    plt.bar(x_list, y_list, color=['lightsteelblue', 'coral'], width=0.4)
+
+    plt.subplot(2, 1, 2)
+    plt.xticks(rotation=45)
+    plt.scatter(scatter_x, scatter_y, color='teal')
+    plt.tight_layout()
+    filename_path = "static/images/bool_tracker_" + str(tracker_id) + ".png"
+    plt.savefig(filename_path)
+    plt.close()
+
+    return filename_path
+
+
+def plot_mcTracker(tracker_id, logs):
+    logs = TRACKER_MC.query.filter_by(tracker_id=tracker_id).all()
+    choices_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).first()
+    choices = choices_record.choices.split(",")
+
+    choices_dict = {}
+    for choice in choices:
+        choices_dict[choice] = 0
+
+    for log in logs:
+        choice_selected = (log.value).split(",")
+        for i in choice_selected:
+            choices_dict[i] += 1
+
+    x_list = list(choices_dict.keys())
+    y_list = list(choices_dict.values())
+
+    x_label = plt.xlabel("Choices")
+    y_label = plt.ylabel("#selected")
+    title = plt.title("Summary of your Logs")
+
+    # plt.xticks(rotation=45)
+    # plt.tight_layout()
+    y_range = [i for i in range(0, 100)]
+    plt.yticks(y_range)
+    plt.bar(x_list, y_list,
+            color=['firebrick', 'palegreen', 'teal', 'cyan', 'orange', 'deeppink', 'lightcoral', 'cornflowerblue'])
+
+    filename_path = "static/images/mc_tracker_" + str(tracker_id) + ".png"
+    plt.savefig(filename_path)
+    plt.close()
+
+    return filename_path
+
+
+def plot_tdTracker(tracker_id, logs):
+    x_list = []
+    y_list = []
+    for log in logs:
+        time_diff_obj = (convert_datetime(log.time_end) - convert_datetime(log.time_start))
+
+        difference = float(time_diff_obj.total_seconds() / 60)
+
+        datetime_obj = convert_datetime(log.timestamp)
+
+        x_list.append(datetime_obj)
+        y_list.append(difference)
+
+    x_label = plt.xlabel("Timestamp")
+    y_label = plt.ylabel("Time duration (Minutes)")
+    title = plt.title("Summary of your Logs")
+
+    plt.xticks(rotation=45)
+
+    plt.scatter(x_list, y_list, color='red')
+    plt.tight_layout()
+
+    filename_path = "static/images/td_tracker_" + str(tracker_id) + ".png"
+    plt.savefig(filename_path)
+    plt.close()
+
+    return filename_path
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/mail.py
+================================================
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email.encoders import *
+import os
+
+SMTP_SERVER_HOST = "localhost"
+SMTP_SERVER_PORT = 1025
+SENDER_ADDRESS = "no-reply@lyf-record.com"
+SENDER_PASSWORD = ""
+
+
+def send_email(to, subject, msg, attachment=None):
+    mail = MIMEMultipart()
+    mail["From"] = SENDER_ADDRESS
+    mail["Subject"] = subject
+    mail["To"] = to
+
+    mail.attach(MIMEText(msg, "html"))
+
+    if attachment is not None:
+        with open(attachment, "rb") as attachment_file:
+            # adding file as an output stream
+            part = MIMEBase("application", "octet-stream")
+            part.set_payload(attachment_file.read())
+            encode_base64(part)
+
+        part.add_header("Content-Disposition", f"attachment; filename={attachment[len('static/logs_download/'):]}")
+        mail.attach(part)
+
+    s = smtplib.SMTP(host=SMTP_SERVER_HOST, port=SMTP_SERVER_PORT)
+    s.login(SENDER_ADDRESS, SENDER_PASSWORD)
+    s.send_message(mail)
+    s.quit()
+    if attachment is not None:
+        os.remove(attachment)
+
+    return True
+
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/models.py
+================================================
+from .database import db
+
+'''
+In this file, we have all the necessary models to link with the database file.
+We are extending the existing db.Model class with our user defined classes.
+Each table has its own class.
+We are defining the table name, attributes of the table along with the constraints.
+'''
+
+
+class USER(db.Model):
+    __tablename__ = "user"
+    username = db.Column(db.String, primary_key=True)
+    password = db.Column(db.String, nullable=False)
+    email = db.Column(db.String)  # Of no use yet, but can be used while implementing "forgot password?" functionality
+    creation = db.Column(db.String)  # Date of creation of the user.
+    last_log = db.Column(db.String)  # last logged value by the user.
+
+
+class TRACKER(db.Model):
+    __tablename__ = "tracker"
+    tracker_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    description = db.Column(db.String)
+    name = db.Column(db.String)
+    type = db.Column(db.String)
+    last_log = db.Column(db.String, default='Not yet logged!')  # For storing the timestamp of last logged value in the tracker
+
+
+class USER_TRACKER(db.Model):  # Links user and tracker together
+    __tablename__ = "user_tracker"
+    ID = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String, db.ForeignKey(USER.username), nullable=False)
+    tracker_id = db.Column(db.Integer, db.ForeignKey(TRACKER.tracker_id), nullable=False)
+
+
+class STREAK(db.Model): # Additional feature; Each user will have a streak count.
+    __tablename__ = "streak"
+    streak_id = db.Column(db.Integer, primary_key=True, autoincrement=True )
+    username = db.Column(db.String, db.ForeignKey(USER.username), nullable=False, unique=True)
+    date = db.Column(db.String, nullable=False)
+    count = db.Column(db.Integer)  # Default is 1, which has been implemented in the code, when a user signs up.
+
+
+class TRACKER_BOOL(db.Model):  # For tracker type = boolean
+    __tablename__ = "tracker_bool"
+    log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tracker_id = db.Column(db.Integer, db.ForeignKey(TRACKER.tracker_id), nullable=False)
+    timestamp = db.Column(db.String, nullable=False)
+    value = db.Column(db.String, nullable=False)
+    note = db.Column(db.String)
+
+
+class TRACKER_NUM(db.Model):  # For tracker type = numerical
+    __tablename__ = "tracker_num"
+    log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tracker_id = db.Column(db.Integer, db.ForeignKey(TRACKER.tracker_id), nullable=False)
+    timestamp = db.Column(db.String, nullable=False)
+    value = db.Column(db.Integer, nullable=False)
+    note = db.Column(db.String)
+
+
+class TRACKER_TD(db.Model):  # For tracker type = time duration
+    __tablename__ = "tracker_td"
+    log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tracker_id = db.Column(db.Integer, db.ForeignKey(TRACKER.tracker_id), nullable=False)
+    timestamp = db.Column(db.String, nullable=False)
+    time_start = db.Column(db.String, nullable=False)
+    time_end = db.Column(db.String, nullable=False)
+    note = db.Column(db.String)
+
+
+class TRACKER_MC(db.Model):  # For tracker type = multi choice
+    __tablename__ = "tracker_mc"
+    log_id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tracker_id = db.Column(db.Integer, db.ForeignKey(TRACKER.tracker_id), nullable=False)
+    timestamp = db.Column(db.String, nullable=False)
+    value = db.Column(db.String, nullable=False)
+    note = db.Column(db.String)
+
+
+class MULTI_CHOICES(db.Model):  # For storing all the choices for tracker type = multi choice
+    __tablename__ = "multi_choices"
+    tracker_id = db.Column(db.Integer, db.ForeignKey(TRACKER.tracker_id), nullable=False, primary_key=True)
+    choices = db.Column(db.String)
+
+
+# Finally, committing everything to the DB
+db.session.commit()
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/monthly_report.py
+================================================
+import os
+from .models import *
+import datetime
+from weasyprint import HTML
+from .timestamp import *
+import pdfkit
+
+
+def accountDetails(user):
+    account_details = dict()
+    # ----------------------
+    # Username -->
+    account_details["username"] = user
+    # ----------------------
+    # Streak count -->
+    account_details["streak"] = STREAK.query.filter_by(username=user).first().count
+    # ----------------------
+    # Trackers count -->
+    trackers = USER_TRACKER.query.filter_by(username=user).distinct()
+    tracker_count = 0
+    for i in trackers:
+        tracker_count += 1
+    account_details["No. of trackers"] = tracker_count
+    # ----------------------
+    # Member since -->
+    member_create = USER.query.filter_by(username=user).first()
+    member_since = str(datetime.datetime.today() - datetime.datetime.strptime(member_create.creation, '%Y-%m-%d'))
+    member_since = member_since.split(",")
+    account_details["Member Since"] = member_since[0]
+    # ----------------------
+    # Last logged
+    account_details["last_logged"] = USER.query.filter_by(username=user).first().last_log
+    # ----------------------
+    return account_details
+
+
+def trackerDetails(user):
+    tracker_ids = USER_TRACKER.query.filter_by(username=user).distinct()
+    trackers = [TRACKER.query.filter_by(tracker_id=t_id.tracker_id).first() for t_id in tracker_ids]
+    return trackers
+
+
+def logDetails(user):
+    tracker_ids = USER_TRACKER.query.filter_by(username=user).distinct()
+    all_logs = dict()
+    for tracker_obj in tracker_ids:
+        logs = None
+        tracker_id = tracker_obj.tracker_id
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+
+        if tracker.type == 'num':
+            logs = TRACKER_NUM.query.filter_by(tracker_id=tracker_id).all()
+
+        elif tracker.type == 'bool':
+            logs = TRACKER_BOOL.query.filter_by(tracker_id=tracker_id).all()
+
+        elif tracker.type == 'time_dur':
+            logs = TRACKER_TD.query.filter_by(tracker_id=tracker_id).all()
+
+        elif tracker.type == 'mc':
+            logs = TRACKER_MC.query.filter_by(tracker_id=tracker_id).all()
+        all_logs[tracker_id] = [tracker.type, logs]
+
+    return all_logs
+
+
+def generate_pdf(usr, template):
+    month = date_today().strftime("%B")
+    file_name = f"static/logs_download/monthly_report_{str(usr)}_{month}.pdf"
+    pdfkit.from_string(template, f'{file_name}')
+
+    return file_name
+
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/timestamp.py
+================================================
+from datetime import datetime as dt
+from datetime import date
+'''
+A function which converts and returns the current time from datetime object to string in the HTML datetime-local format
+
+Another function to perform the reverse action. Convert string to datetime object!
+
+A 3rd function to give creation date 
+'''
+
+
+def current_timestamp():
+    current_time = dt.now()
+    datetime_str = current_time.strftime('%Y-%m-%dT%H:%M')  # Converts to a format of type - 2022-03-03T15:27
+    return datetime_str  # returning the string formatted current time stamp
+
+
+def convert_datetime(datetime_value):
+    from datetime import datetime
+
+    datetime_object = datetime.strptime(datetime_value, '%Y-%m-%dT%H:%M')  # 2022-03-03T15:27
+    return datetime_object
+
+
+def date_today():
+    return date.today()
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/to_csv.py
+================================================
+import csv
+from .timestamp import *  # current time stamp
+from flask import send_file
+from .models import *
+'''
+A function to write all the logs to a csv file and return the send_file() function of FLASK, which is used to send
+files to the client.
+
+CSV file has a filename of log_{{tracker_type}}_{{timestamp}}, where timestamp is the time of downloading the log!
+
+CSV is created and stored in the folder static/logs_download/
+CSV file is also deleted after it has been sent to the client. This has been implemented in the controller. 
+'''
+
+
+def log_export(tracker_type, logs):  # tracker_Type and all the logs are given as the parameters
+    filename = "log_" + tracker_type + "_" + current_timestamp() + ".csv"  # defining the file name
+    with open("static/logs_download/"+filename, 'w', newline='') as log_file:
+        csv_writer = csv.writer(log_file, delimiter=',')  # Creating a CSV writer object.
+        if tracker_type == 'time_dur':
+            # First, writing the header of the CSV file, i.e., all the titles.
+            # This is different for time_dur tracker type and for all other trackers!
+            csv_writer.writerow(['log_id', "tracker_id", "timestamp", "start_time", "end_time", "note"])
+            for log in logs:  # Iterating through the logs, and then writing them to the csv file
+                csv_writer.writerow([log.log_id, log.tracker_id, log.timestamp, log.time_start, log.time_end, log.note])
+        else:
+            csv_writer.writerow(['log_id', "tracker_id", "timestamp", "value", "note"])
+            for log in logs:
+                csv_writer.writerow([log.log_id, log.tracker_id, log.timestamp, log.value, log.note])
+
+    # returning the send_file method of FLASK and the filename(used while deleting the file from the server)
+    return f"static/logs_download/{filename}"
+
+
+def tracker_export(trackers_list):
+    uname = USER_TRACKER.query.filter_by(tracker_id=trackers_list[0]).first().username
+    filename = f"{uname}_trackers_{current_timestamp()}.csv"
+    with open("static/logs_download/"+filename, 'w', newline='') as tracker_file:
+        csv_writer = csv.writer(tracker_file, delimiter=',')
+
+        csv_writer.writerow(['tracker_id'.upper(), "name".upper(),
+                             "description".upper(), "type".upper(), "last logged value".upper()])
+        for tracker_id in trackers_list:
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+            csv_writer.writerow([tracker.tracker_id, tracker.name,
+                                 tracker.description, tracker.type, tracker.last_log])
+
+    return f'static/logs_download/{filename}'
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/workers.py
+================================================
+from celery import Celery
+
+# Creating a Celery object
+
+
+# A class to override the __call__ function which will be called
+# at the time of executing async task
+
+def make_celery(app):
+    celery = Celery(app.import_name)
+    celery.conf.update(app.config["CELERY_CONFIG"])
+
+    class ContextTask(celery.Task):
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                print("--------------")
+                print("Starting the task now")
+                print("--------------")
+                return self.run(*args, **kwargs)
+
+    celery.Task = ContextTask
+    return celery
+
+
+
+
+
+
+================================================
+File: src/QuantifiedSelfApp-FLASK/Application/ApiFunctions/allApiFunctions.py
+================================================
+from flask_restful import Resource, reqparse
+from flask import session, redirect, jsonify
+from ..models import *
+from ..timestamp import *
+import datetime
+from flask import request, redirect
+from flask import session, url_for
+from flask import current_app as app
+from ..controller_index import *
+from ..graph import *
+from ..to_csv import *
+import matplotlib.pyplot as plt
+import os
+from flask_jwt_extended import create_access_token
+from flask_jwt_extended import jwt_required
+from flask_cors import cross_origin
+from ..cache_instance import current_cache_inst as cache
+
+'''
+This file contains all the cached functions which are to be used for the API
+'''
+
+
+@cache.memoize(timeout=120)
+def getDashboardDetails(si_un=None):
+    if si_un:
+
+        streak = STREAK.query.filter_by(username=si_un).first().count
+        # ----------------------
+
+        # Tracker count ->
+        trackers = USER_TRACKER.query.filter_by(username=si_un).distinct()
+        tracker_count = 0
+        for i in trackers:
+            tracker_count += 1
+        # ----------------------
+
+        # member since ->
+        member_create = USER.query.filter_by(username=si_un).first()
+        member_since = str(
+            datetime.datetime.today() - datetime.datetime.strptime(member_create.creation, '%Y-%m-%d'))
+        member_since = member_since.split(",")
+        member_since = member_since[0]
+        # ----------------------
+
+        # List of trackers ->
+        tracker_ids = USER_TRACKER.query.filter_by(username=si_un).distinct()
+        trackers = {}
+
+        for t_id in tracker_ids:
+            temp = (TRACKER.query.filter_by(tracker_id=t_id.tracker_id).first())
+            trackers[temp.tracker_id] = [temp.name, temp.type, temp.last_log]
+
+        # ----------------------
+
+        #  path link for dashboard graph
+
+        filename_path = plot_homepage(si_un=si_un)
+
+        return jsonify(
+            {"streak": streak, "tracker_count": tracker_count, "member_since": member_since, "trackers": trackers,
+             "graph_path": filename_path})
+
+    else:
+        return {}, 404
+
+
+@cache.memoize(timeout=120)
+def getTrackerDetails(si_un=None):
+    if si_un:
+
+        tracker_ids = USER_TRACKER.query.filter_by(username=si_un).distinct()
+        trackers = []
+        for tid in tracker_ids:
+            trackers.append(TRACKER.query.filter_by(tracker_id=tid.tracker_id).first())
+
+        temp = {}
+        for tracker in trackers:
+            temp[tracker.tracker_id] = [tracker.name, tracker.description, tracker.type, tracker.last_log]
+        return temp
+
+    else:
+        return {"message": "login required"}, "404"
+
+
+@cache.memoize(timeout=120)
+def getLogDetails(si_un=None, tracker_id=None):
+    if si_un:
+
+        try:
+            tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+
+            if tracker.type == 'num':
+                logs = TRACKER_NUM.query.filter_by(tracker_id=tracker_id).all()
+                filename_path = plot_numTracker(tracker_id, logs)
+
+            elif tracker.type == 'bool':
+                logs = TRACKER_BOOL.query.filter_by(tracker_id=tracker_id).all()
+                filename_path = plot_BoolTracker(tracker_id, logs)
+
+            elif tracker.type == 'time_dur':
+                logs = TRACKER_TD.query.filter_by(tracker_id=tracker_id).all()
+                filename_path = plot_tdTracker(tracker_id, logs)
+
+            elif tracker.type == 'mc':
+                logs = TRACKER_MC.query.filter_by(tracker_id=tracker_id).all()
+                filename_path = plot_mcTracker(tracker_id, logs)
+
+            temp = {"plot": filename_path, "type": tracker.type,
+                    "logs": {}, "name": tracker.name}
+            for log in logs:
+                if tracker.type == 'time_dur':
+                    temp["logs"][log.log_id] = [log.timestamp,
+                                                [log.time_start, log.time_end],
+                                                log.note]
+                else:
+                    temp["logs"][log.log_id] = [log.timestamp,
+                                                log.value,
+                                                log.note]
+
+            return temp
+
+        except:
+            return {"Message": "Failed to retrieve data."}, 404
+
+    else:  # If user is not in the session, redirect to login page. ((prevents direct access of URI)
+        return {"message": "Login required."}, 400
+
+
+@cache.memoize(timeout=120)
+def getTrackerInfo(si_un=None, tracker_id=None):
+    if si_un:
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+        choices = None
+        if tracker.type == 'mc':
+            choices_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).first()
+            choices = choices_record.choices.split(",")
+
+        data = {
+            "name": tracker.name,
+            "desc": tracker.description,
+            "type": tracker.type,
+            "choices": choices,
+            "currentTime": str(current_timestamp())
+        }
+
+        return data, 200
+    else:
+        return {"msg": "Failed"}, 400
+
+
+@cache.memoize(timeout=120)
+def getLogInfo(si_un=None, tracker_id=None, log_id=None):
+    if si_un:
+        tracker = TRACKER.query.filter_by(tracker_id=tracker_id).first()
+
+        if tracker.type == 'num':
+            log = TRACKER_NUM.query.filter_by(log_id=log_id).first()
+
+        elif tracker.type == 'bool':
+            log = TRACKER_BOOL.query.filter_by(log_id=log_id).first()
+
+        elif tracker.type == 'time_dur':
+            log = TRACKER_TD.query.filter_by(log_id=log_id).first()
+
+            data = {
+                "trackerType": tracker.type,
+                "trackerName": tracker.name,
+                "start_time": log.time_start,
+                "end_time": log.time_end,
+                "timestamp": log.timestamp,
+                "note": log.note,
+            }
+            return data, 200
+
+        elif tracker.type == 'mc':
+            log = TRACKER_MC.query.filter_by(log_id=log_id).first()
+
+            choices_record = MULTI_CHOICES.query.filter_by(tracker_id=tracker_id).first()
+            choices = choices_record.choices.split(",")
+            choices_marked_record = TRACKER_MC.query.filter_by(log_id=log_id).first()
+            choices_marked = choices_marked_record.value.split(",")
+
+            data = {
+                "trackerType": tracker.type,
+                "trackerName": tracker.name,
+                "logValue": log.value,
+                "timestamp": log.timestamp,
+                "note": log.note,
+                "choices": choices,
+                "choicesMarked": choices_marked
+            }
+
+            return data, 200
+
+        data = {
+            "trackerName": tracker.name,
+            "trackerType": tracker.type,
+            "logValue": log.value,
+            "timestamp": log.timestamp,
+            "note": log.note,
+        }
+
+        return data, 200
+
+    return {"msg": "Failed"}, 400
+
+

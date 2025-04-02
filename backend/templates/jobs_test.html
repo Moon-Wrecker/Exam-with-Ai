@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backend Jobs Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .response-container {
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+        }
+        h1 {
+            margin-bottom: 30px;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .status-badge {
+            font-size: 14px;
+            padding: 5px 10px;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Master Backend Jobs Test</h1>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Test Celery Connection</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Test basic Celery functionality (no application context required).</p>
+                        <p><small>Use this to check if Celery and Redis are working properly.</small></p>
+                        <div class="d-grid">
+                            <button id="testCelery" class="btn btn-dark">Test Celery</button>
+                        </div>
+                        <div id="testCeleryResponse" class="response-container d-none">
+                            <pre id="testCeleryResponseText"></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Daily Reminder Job</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Manually trigger the daily reminder job for all users.</p>
+                        <p><small>This will check for inactive users and new quizzes.</small></p>
+                        <div class="d-grid">
+                            <button id="triggerReminder" class="btn btn-primary">Trigger Daily Reminder</button>
+                        </div>
+                        <div id="reminderResponse" class="response-container d-none">
+                            <pre id="reminderResponseText"></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">Monthly Report Job</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Manually trigger the monthly activity report job.</p>
+                        <p><small>This will generate and email reports to all active users.</small></p>
+                        <div class="d-grid">
+                            <button id="triggerMonthlyReport" class="btn btn-success">Trigger Monthly Report</button>
+                        </div>
+                        <div id="monthlyReportResponse" class="response-container d-none">
+                            <pre id="monthlyReportResponseText"></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">Export User Scores</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Export your quiz scores as a CSV file.</p>
+                        <form id="exportUserForm">
+                            <div class="mb-3">
+                                <label for="userId" class="form-label">User ID</label>
+                                <input type="number" class="form-control" id="userId" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-info">Export My Scores</button>
+                            </div>
+                        </form>
+                        <div id="exportUserResponse" class="response-container d-none">
+                            <pre id="exportUserResponseText"></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-warning">
+                        <h5 class="mb-0">Check Task Status</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Check the status of a previously triggered job.</p>
+                        <form id="checkTaskForm">
+                            <div class="mb-3">
+                                <label for="taskId" class="form-label">Task ID</label>
+                                <input type="text" class="form-control" id="taskId" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-warning">Check Status</button>
+                            </div>
+                        </form>
+                        <div id="taskStatusResponse" class="response-container d-none">
+                            <pre id="taskStatusResponseText"></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">Download Export</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>Download a previously exported file.</p>
+                        <form id="downloadForm">
+                            <div class="mb-3">
+                                <label for="filename" class="form-label">Filename</label>
+                                <input type="text" class="form-control" id="filename" placeholder="e.g. user_1_scores_20230101123456.csv" required>
+                            </div>
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-dark">Download File</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Token management (you would get this from your login process)
+        const JWT_TOKEN = localStorage.getItem('token') || '';
+        
+        // Helper for API calls
+        async function apiCall(url, method = 'GET', body = null) {
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JWT_TOKEN}`
+            };
+            
+            const options = {
+                method,
+                headers
+            };
+            
+            if (body) {
+                options.body = JSON.stringify(body);
+            }
+            
+            const response = await fetch(url, options);
+            return await response.json();
+        }
+        
+        // Test Celery connection
+        document.getElementById('testCelery').addEventListener('click', async () => {
+            try {
+                const testCeleryResponse = document.getElementById('testCeleryResponse');
+                const testCeleryResponseText = document.getElementById('testCeleryResponseText');
+                
+                testCeleryResponse.classList.remove('d-none');
+                testCeleryResponseText.textContent = 'Testing Celery connection...';
+                
+                const result = await apiCall('/api/jobs/test-celery');
+                
+                testCeleryResponseText.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('testCeleryResponseText').textContent = `Error: ${error.message}`;
+            }
+        });
+        
+        // Daily reminder job
+        document.getElementById('triggerReminder').addEventListener('click', async () => {
+            try {
+                const reminderResponse = document.getElementById('reminderResponse');
+                const reminderResponseText = document.getElementById('reminderResponseText');
+                
+                reminderResponse.classList.remove('d-none');
+                reminderResponseText.textContent = 'Triggering daily reminder job...';
+                
+                const result = await apiCall('/api/jobs/trigger-reminder', 'POST');
+                
+                reminderResponseText.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('reminderResponseText').textContent = `Error: ${error.message}`;
+            }
+        });
+        
+        // Monthly report job
+        document.getElementById('triggerMonthlyReport').addEventListener('click', async () => {
+            try {
+                const monthlyReportResponse = document.getElementById('monthlyReportResponse');
+                const monthlyReportResponseText = document.getElementById('monthlyReportResponseText');
+                
+                monthlyReportResponse.classList.remove('d-none');
+                monthlyReportResponseText.textContent = 'Triggering monthly report job...';
+                
+                const result = await apiCall('/api/jobs/trigger-monthly-report', 'POST');
+                
+                monthlyReportResponseText.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('monthlyReportResponseText').textContent = `Error: ${error.message}`;
+            }
+        });
+        
+        // Export user scores
+        document.getElementById('exportUserForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const userId = document.getElementById('userId').value;
+                const exportUserResponse = document.getElementById('exportUserResponse');
+                const exportUserResponseText = document.getElementById('exportUserResponseText');
+                
+                exportUserResponse.classList.remove('d-none');
+                exportUserResponseText.textContent = 'Exporting user scores...';
+                
+                const result = await apiCall('/api/export/scores', 'POST', { user_id: userId });
+                
+                exportUserResponseText.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('exportUserResponseText').textContent = `Error: ${error.message}`;
+            }
+        });
+        
+        // Check task status
+        document.getElementById('checkTaskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            try {
+                const taskId = document.getElementById('taskId').value;
+                const taskStatusResponse = document.getElementById('taskStatusResponse');
+                const taskStatusResponseText = document.getElementById('taskStatusResponseText');
+                
+                taskStatusResponse.classList.remove('d-none');
+                taskStatusResponseText.textContent = 'Checking task status...';
+                
+                const result = await apiCall(`/api/tasks/${taskId}`);
+                
+                taskStatusResponseText.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('taskStatusResponseText').textContent = `Error: ${error.message}`;
+            }
+        });
+        
+        // Download export file
+        document.getElementById('downloadForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const filename = document.getElementById('filename').value;
+            window.location.href = `/api/export/download/${filename}?token=${JWT_TOKEN}`;
+        });
+    </script>
+</body>
+</html>

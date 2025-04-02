@@ -1,0 +1,50 @@
+User Profile Management
+Missing fields in user registration/profile:
+Qualification
+DOB (Date of Birth)
+No profile editing functionality for users
+Quiz Timer Implementation
+While you have quiz functionality, the timer feature (HH:MM format) is not fully implemented
+Need to add countdown timer display
+Need to enforce time limits during quiz attempts
+Summary Charts
+Missing visualization components:
+Bar chart for subject-wise quiz scores
+Pie chart for monthly quiz attempts
+No ChartJS integration found
+Backend Jobs
+Missing scheduled jobs:
+Daily reminders via Google Chat Webhooks
+Monthly activity report generation and email sending
+Missing user-triggered async jobs:
+CSV export functionality for quiz details
+Export functionality for admin to view all quiz data
+Performance and Caching
+No Redis caching implementation found
+Missing cache expiry configurations
+No API performance optimizations visible
+UI/UX Enhancements
+Missing responsive design elements
+No "Add to desktop" feature
+Missing form validation on frontend
+No unified mobile/desktop UI implementation
+Additional Features
+No PDF report generation option
+Missing dummy payment portal
+No language selection dropdown in header
+Missing question paper view functionality
+No instructions page/component
+Admin Features
+Missing search functionality for users/subjects/quizzes
+No summary charts in admin dashboard
+Missing quiz management features:
+Date and duration specification
+Question management interface
+Security and Validation
+Missing backend validation in APIs
+No comprehensive form validation
+Missing proper error handling for API responses
+Documentation
+Missing API documentation
+No user guide or help documentation
+Missing setup instructions for development

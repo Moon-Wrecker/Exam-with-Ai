@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Activity Report - {{ month }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f7f7;
+            color: #333;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 6px;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+            margin-bottom: 5px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+            font-size: 20px;
+        }
+        .summary-box {
+            background-color: #f8f9fa;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background-color: #fff;
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #3498db;
+            margin: 10px 0;
+        }
+        .stat-label {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+        }
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin: 5px 0;
+        }
+        .progress-bar {
+            height: 10px;
+            border-radius: 10px;
+            background-color: #3498db;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+        }
+        .badge-success {
+            background-color: #2ecc71;
+        }
+        .badge-warning {
+            background-color: #f39c12;
+        }
+        .badge-danger {
+            background-color: #e74c3c;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        .score-grade {
+            font-weight: bold;
+        }
+        .rank-highlight {
+            font-weight: bold;
+            color: #16a085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">Quiz Master</div>
+            <h1>Monthly Activity Report</h1>
+            <p>{{ month }}</p>
+        </div>
+
+        <div class="summary-box">
+            <p>Dear <strong>{{ user.full_name }}</strong>,</p>
+            <p>Here's your personalized activity summary for {{ month }}. This report shows your quiz performance and progress during the past month.</p>
+        </div>
+
+        <div class="stat-grid">
+            <div class="stat-card">
+                <div class="stat-label">Quizzes Attempted</div>
+                <div class="stat-value">{{ total_quizzes }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Average Score</div>
+                <div class="stat-value">{{ avg_score }}%</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Ranking</div>
+                <div class="stat-value">{{ rank }}/{{ total_users }}</div>
+            </div>
+        </div>
+
+        <h2>Subject Performance</h2>
+        <table>
+            <tr>
+                <th>Subject</th>
+                <th>Average Score</th>
+                <th>Quizzes</th>
+            </tr>
+            {% for subject_id, data in subject_performance.items() %}
+            <tr>
+                <td>{{ data.name }}</td>
+                <td>
+                    {% if data.total >= 80 %}
+                        <span class="score-grade badge badge-success">{{ data.total }}%</span>
+                    {% elif data.total >= 60 %}
+                        <span class="score-grade badge badge-warning">{{ data.total }}%</span>
+                    {% else %}
+                        <span class="score-grade badge badge-danger">{{ data.total }}%</span>
+                    {% endif %}
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width: {{ data.total }}%"></div>
+                    </div>
+                </td>
+                <td>{{ data.count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        {% if scores %}
+        <h2>Recent Quiz Attempts</h2>
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Quiz</th>
+                <th>Score</th>
+            </tr>
+            {% for score in scores %}
+            <tr>
+                <td>{{ score.timestamp.strftime('%Y-%m-%d') }}</td>
+                <td>{{ score.quiz.chapter.subject.name }} - {{ score.quiz.chapter.name }}</td>
+                <td>
+                    {% if score.percentage >= 80 %}
+                        <span class="score-grade badge badge-success">{{ score.percentage }}%</span>
+                    {% elif score.percentage >= 60 %}
+                        <span class="score-grade badge badge-warning">{{ score.percentage }}%</span>
+                    {% else %}
+                        <span class="score-grade badge badge-danger">{{ score.percentage }}%</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
+
+        <div class="summary-box">
+            <h2>Your Ranking</h2>
+            <p>You ranked <span class="rank-highlight">#{{ rank }}</span> out of {{ total_users }} active users this month.</p>
+            
+            {% if rank <= 3 and total_users >= 10 %}
+            <p><strong>Congratulations!</strong> You're in the top performers this month.</p>
+            {% elif rank <= total_users * 0.25 %}
+            <p><strong>Great job!</strong> You're in the top 25% of all users.</p>
+            {% elif rank <= total_users * 0.5 %}
+            <p><strong>Good progress!</strong> You're in the top half of all users.</p>
+            {% else %}
+            <p><strong>Keep practicing!</strong> Regular quiz taking will help improve your scores.</p>
+            {% endif %}
+        </div>
+
+        <div class="footer">
+            <p>This report was automatically generated on {{ current_date }}.</p>
+            <p>© Quiz Master 2023. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,722 @@
+from celery import Celery, Task
+
+def celery_init_app(app):
+    class FlaskTask(Task):
+        def __call__(self, *args: object, **kwargs: object):
+            with app.app_context():
+                return self.run(*args, **kwargs)
+
+    celery_app = Celery(app.name, task_cls=FlaskTask, broker='redis://localhost:6379/0', backend='redis://localhost:6379/0')
+    celery_app.config_from_object("celery_config")
+    celery_app.set_default()
+    app.extensions["celery"] = celery_app
+    return celery_app
+
+from email import encoders
+from jinja2 import Template
+from flask_mail import Mail, Message
+from flask import current_app
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+
+# SMTP Configuration (Update these values)
+SMTP_SERVER_HOST = 'localhost'
+SMTP_SERVER_PORT = 1025
+SENDER_ADDRESS = "houseservices@gmail.com"
+SENDER_PASSWORD = None
+
+# Initialize Flask-Mail instance
+mail = Mail()
+
+def init_mail(app):
+    """
+    Initialize Flask-Mail with the given Flask app.
+    """
+    mail.init_app(app)
+
+def send_email(to_address, subject, message, content="text"):
+    """
+    Sends an email using direct SMTP
+    
+    Args:
+        to_address: Recipient email address
+        subject: Email subject
+        message: Message content
+        content: Type of content ('text' or 'html')
+    """
+    try:
+        # Create message container
+        msg = MIMEMultipart()
+        msg['Subject'] = subject
+        msg['From'] = SENDER_ADDRESS
+        msg['To'] = to_address
+        
+        # Set the appropriate message content
+        if content == "html":
+            part = MIMEText(message, 'html')
+        else:
+            part = MIMEText(message, 'plain')
+        
+        msg.attach(part)
+        
+        # Send the message via local SMTP server
+        print(f"Connecting to SMTP: {SMTP_SERVER_HOST}:{SMTP_SERVER_PORT}")
+        smtp = smtplib.SMTP(SMTP_SERVER_HOST, SMTP_SERVER_PORT)
+        smtp.send_message(msg)
+        smtp.quit()
+        
+        print(f"Email sent successfully to {to_address}")
+        return True
+    except Exception as e:
+        print(f"Failed to send email: {str(e)}")
+        return False
+
+from flask_caching import Cache
+
+# Create global cache instance
+cache = Cache()
+
+def cache_init_app(app):
+    """Initialize the cache extension with the given app."""
+    # Configure caching from app config
+    cache_config = {
+        'CACHE_TYPE': app.config.get('CACHE_TYPE', 'simple'),
+        'CACHE_DEFAULT_TIMEOUT': app.config.get('CACHE_DEFAULT_TIMEOUT', 300)
+    }
+    
+    # If Redis is configured
+    if app.config.get('CACHE_TYPE') == 'redis':
+        cache_config['CACHE_REDIS_URL'] = app.config.get('CACHE_REDIS_URL', 'redis://localhost:6379/0')
+    
+    # Initialize with app
+    cache.init_app(app, config=cache_config)
+    return cache 
+from jinja2 import Template
+import requests
+import functools
+import hashlib
+import json
+from backend.application.cache_init import cache
+
+def format_report(html_template, data):
+    with open(html_template) as file:
+        template = Template(file.read())
+        # Allow both dictionary with 'data' key and direct parameter passing
+        if isinstance(data, dict) and 'data' not in data:
+            return template.render(**data)
+        return template.render(data=data)
+
+def fetch_user_data():
+    url = "http://localhost:8025/api/v2/users/jim"
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        return response.json()
+    else:
+        raise Exception(f"API Failed with status code {response.status_code}: {response.text}")
+
+# Cache helper functions
+
+def cached(timeout=300, key_prefix='view'):
+    """Simple wrapper for cached routes using Flask-Caching.
+    
+    Args:
+        timeout: Cache timeout in seconds
+        key_prefix: Prefix for the cache key
+        
+    Example:
+        @cached(timeout=60, key_prefix='my_view')
+        def my_view():
+            return expensive_operation()
+    """
+    def decorator(f):
+        @functools.wraps(f)
+        def decorated_function(*args, **kwargs):
+            return cache.cached(timeout=timeout, key_prefix=key_prefix)(f)(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+def cached_with_args(timeout=300):
+    """Cache a function based on its arguments.
+    
+    Args:
+        timeout: Cache timeout in seconds
+        
+    Example:
+        @cached_with_args(timeout=60)
+        def get_user(user_id):
+            return db.query.get(user_id)
+    """
+    def decorator(f):
+        @functools.wraps(f)
+        def decorated_function(*args, **kwargs):
+            # Create a cache key based on function name and arguments
+            cache_key = f.__module__ + f.__name__ + str(args) + str(sorted(kwargs.items()))
+            cache_key = hashlib.md5(cache_key.encode('utf-8')).hexdigest()
+            
+            # Try to get from cache
+            result = cache.get(cache_key)
+            if result is not None:
+                return result
+            
+            # If not in cache, call the function
+            result = f(*args, **kwargs)
+            
+            # Store in cache
+            cache.set(cache_key, result, timeout=timeout)
+            return result
+        return decorated_function
+    return decorator
+
+def invalidate_cache_key(key):
+    """Manually invalidate a specific cache key."""
+    cache.delete(key)
+    
+def invalidate_cache_prefix(prefix):
+    """Invalidate all cache keys with a given prefix."""
+    cache.delete_many(prefix)
+
+def memoize(func):
+    """Cache the result of a function for the duration of a request.
+    
+    This is useful for functions that are called multiple times 
+    within a single request but with the same arguments.
+    
+    Example:
+        @memoize
+        def expensive_calculation(x, y):
+            # This will only be executed once per request
+            # for the same x and y values
+            return x * y
+    """
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        # Create a key from the function name and arguments
+        key = func.__name__ + str(args) + str(sorted(kwargs.items()))
+        key = hashlib.md5(key.encode('utf-8')).hexdigest()
+        
+        # Check if we have a request context
+        from flask import g, has_request_context
+        if not has_request_context():
+            # If not in a request context, just call the function
+            return func(*args, **kwargs)
+        
+        # Initialize cache dict in g if not present
+        if not hasattr(g, 'memoize_cache'):
+            g.memoize_cache = {}
+            
+        # Check if result is in cache
+        if key in g.memoize_cache:
+            return g.memoize_cache[key]
+            
+        # Call the function and cache the result
+        result = func(*args, **kwargs)
+        g.memoize_cache[key] = result
+        return result
+        
+    return wrapper
+
+from celery import shared_task, Celery
+from .models import User, ServiceProfessional, Service, ServiceRequest, Reviews, Role, BlockedUsers
+import time
+# import datetime
+import csv
+from flask_mail import Mail, Message
+from jinja2 import Template
+from flask import render_template
+from celery.schedules import crontab
+from datetime import datetime
+from flask import render_template
+from .mail import send_email  # Import the email utility
+import os  # Add this import
+
+
+
+celery = Celery('tasks', broker='redis://localhost:6379/0', backend='redis://localhost:6379/1')
+celery.conf.timezone = "Asia/Kolkata"
+celery.conf.broker_connection_retry_on_startup = True
+celery.conf.task_serializer = 'json'
+celery.conf.result_serializer = 'json'
+celery.conf.accept_content = ['json']
+celery.conf.worker_hijack_root_logger = False
+celery.conf.worker_redirect_stdouts = False
+
+
+# mail = Mail()
+#scheduled tasks
+@celery.task(ignore_results=False, name='backend.application.task.monthly_report')
+def monthly_report():
+    """Scheduled task to send monthly reports to customers."""
+    try:
+        from flask import current_app
+        with current_app.app_context():
+            # Set the template folder explicitly
+            TEMPLATE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'templates'))
+            current_app.template_folder = TEMPLATE_DIR
+            print(f"Resolved TEMPLATE_DIR: {TEMPLATE_DIR}")
+
+            # Configure mail settings explicitly for this app context
+            current_app.config['MAIL_SERVER'] = 'localhost'
+            current_app.config['MAIL_PORT'] = 1025
+            current_app.config['MAIL_USERNAME'] = 'houseservices@gmail.com'
+            current_app.config['MAIL_PASSWORD'] = None
+            current_app.config['MAIL_USE_TLS'] = False
+            current_app.config['MAIL_USE_SSL'] = False
+            
+            # Initialize mail with the current app
+            from .mail import init_mail
+            init_mail(current_app)
+
+            customers = User.query.filter_by(role='customer').all()
+            report_date = datetime.now().strftime('%B %Y')
+            
+            print(f"Generating monthly reports for {len(customers)} customers")
+            
+            for customer in customers:
+                try:
+                    # Get user activity data
+                    services_requested = ServiceRequest.query.filter_by(customer_id=customer.id).count()
+                    services_closed = ServiceRequest.query.filter_by(customer_id=customer.id, status='pending').count()
+                    
+                    # Render HTML report
+                    report_html = render_template(
+                        'mail_details.html',
+                        customer_name=customer.username,
+                        services_requested=services_requested,
+                        services_closed=services_closed,
+                        report_date=report_date
+                    )
+                    
+                    # Send email
+                    from .mail import send_email
+                    success = send_email(
+                        to_address=customer.email,
+                        subject=f"Your Monthly Service Report - {report_date}",
+                        message=report_html,
+                        content="html"
+                    )
+                    
+                    if success:
+                        print(f"Email sent to {customer.email}")
+                    else:
+                        print(f"Failed to send email to {customer.email}")
+                        
+                except Exception as customer_error:
+                    print(f"Error processing customer {customer.id}: {str(customer_error)}")
+                    continue
+                    
+            return "Monthly reports sent."
+    except Exception as e:
+        print(f"Error in monthly_report task: {str(e)}")
+        return f"Error: {str(e)}"
+
+@celery.on_after_finalize.connect
+def setup_periodic_tasks(sender, **kwargs):
+    sender.add_periodic_task(
+        crontab(minute='*/2'),  # Runs every 2 minutes
+        monthly_report.s(),
+    )
+# # Schedule the task to run on the first of every month
+# from celery.schedules import crontab
+
+# celery.conf.beat_schedule = {
+#     'send-monthly-report': {
+#         'task': 'tasks.monthly_report',
+#         'schedule': crontab(minute=0, hour=0, day_of_month=1),
+#     },
+# }
+    
+# # Schedule the task to run on the first of every month
+# celery.conf.beat_schedule = {
+#     'send-monthly-report': {
+#         'task': 'tasks.send_monthly_report',
+#         'schedule': crontab(minute=0, hour=0, day_of_month=1),
+#     },
+# }
+
+
+#User Triggered Tasks
+
+@celery.task(ignore_results=False, name='download_csv_report')
+def download_csv_report():
+    try:
+        print("Starting CSV report generation...")
+
+        # Ensure app context is available for DB queries
+        from flask import current_app
+        with current_app.app_context():
+            # Get service requests that have been completed by professionals
+            service_requests = ServiceRequest.query.filter_by(status='completed').all()
+
+            # Create a timestamped filename
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            filename = f"service_requests_{timestamp}.csv"
+            
+            # Setup path for saving the file
+            import os
+            PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            static_dir = os.path.join(PROJECT_ROOT, 'static')
+            os.makedirs(static_dir, exist_ok=True)  # Ensure directory exists
+            
+            # Debugging: Print paths
+            print("Project Root:", PROJECT_ROOT)
+            print("Static Dir:", static_dir)
+                        
+            file_path = os.path.join(static_dir, filename)
+            print(f"Saving CSV to: {file_path}")
+
+            # Open the file in write mode and create a CSV writer
+            with open(file_path, "w", newline="", encoding="utf-8") as csvfile:
+                writer = csv.writer(csvfile)
+
+                # Write the header row with more detailed information
+                writer.writerow([
+                    "Sr. No.", 
+                    "Service ID", 
+                    "Service Name",
+                    "Customer ID", 
+                    "Customer Name",
+                    "Professional ID", 
+                    "Professional Name",
+                    "Request Date",
+                    "Completion Date", 
+                    "Amount", 
+                    "Rating",
+                    "Remarks"
+                ])
+
+                # Write each row of the report with more details
+                for i, req in enumerate(service_requests, 1):
+                    # Get related data
+                    service = Service.query.get(req.service_id)
+                    customer = User.query.get(req.customer_id)
+                    professional = User.query.get(req.professional_id)
+                    
+                    # Get ratings if available
+                    review = Reviews.query.filter_by(service_request_id=req.id).first()
+                    rating = review.rating if review else "N/A"
+                    remarks = review.remarks if review else "N/A"
+                    
+                    # Format dates
+                    request_date = req.created_at.strftime("%Y-%m-%d %H:%M") if req.created_at else "N/A"
+                    completion_date = req.completed_at.strftime("%Y-%m-%d %H:%M") if hasattr(req, 'completed_at') and req.completed_at else "N/A"
+                    
+                    writer.writerow([
+                        i, 
+                        req.service_id, 
+                        service.name if service else "Unknown",
+                        req.customer_id, 
+                        customer.name if customer else "Unknown",
+                        req.professional_id, 
+                        professional.name if professional else "Unknown",
+                        request_date,
+                        completion_date,
+                        req.final_amount if hasattr(req, 'final_amount') else "N/A",
+                        rating,
+                        remarks
+                    ])
+            
+            return filename  # Return filename instead of full path
+
+    except Exception as e:
+        print(f"CSV Generation Error: {str(e)}")
+        import traceback
+        print(traceback.format_exc())
+        return f"ERROR:{str(e)}"
+
+
+
+#Scheduled Tasks
+
+@shared_task(ignore_results = False, name = 'daily_remainder')
+def daily_remainder():
+    return "Daily Remainder Sent"
+
+@celery.task(ignore_results=False, name='generate_monthly_pdf')
+def generate_monthly_pdf():
+    """Generate PDF report for monthly activities"""
+    try:
+        from flask import current_app
+        with current_app.app_context():
+            from reportlab.lib.pagesizes import letter
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from reportlab.lib import colors
+            from dateutil.relativedelta import relativedelta
+            
+            # Generate a unique filename
+            current_month = datetime.now().strftime("%B_%Y")
+            filename = f"Monthly_Activity_Report_{current_month}.pdf"
+            
+            # Setup path for saving the file
+            import os
+            PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            static_dir = os.path.join(PROJECT_ROOT, 'static')
+            os.makedirs(static_dir, exist_ok=True)  # Ensure directory exists
+            
+            filepath = os.path.join(static_dir, filename)
+            print(f"Saving PDF to: {filepath}")
+            
+            # Create the PDF document
+            doc = SimpleDocTemplate(filepath, pagesize=letter)
+            styles = getSampleStyleSheet()
+            elements = []
+            
+            # Title
+            title_style = styles["Heading1"]
+            title = Paragraph(f"Monthly Activity Report - {current_month}", title_style)
+            elements.append(title)
+            elements.append(Spacer(1, 12))
+            
+            # Summary section
+            elements.append(Paragraph("Monthly Summary", styles["Heading2"]))
+            elements.append(Spacer(1, 6))
+            
+            # Calculate date range for the previous month
+            today = datetime.now()
+            first_day = today.replace(day=1) - relativedelta(months=1)
+            last_day = today.replace(day=1) - relativedelta(days=1)
+            
+            # Get statistics for the month
+            new_users = User.query.filter(
+                User.date_created.between(first_day, last_day)
+            ).count() if hasattr(User, 'date_created') else User.query.count()
+            
+            new_requests = ServiceRequest.query.filter(
+                ServiceRequest.created_at.between(first_day, last_day)
+            ).count()
+            
+            completed_requests = ServiceRequest.query.filter(
+                ServiceRequest.status == 'completed',
+                ServiceRequest.completed_at.between(first_day, last_day) if hasattr(ServiceRequest, 'completed_at') else True
+            ).count()
+            
+            # Calculate total revenue
+            total_revenue = 0
+            completed_requests_list = ServiceRequest.query.filter_by(status='completed').all()
+            for req in completed_requests_list:
+                if hasattr(req, 'final_amount') and req.final_amount:
+                    try:
+                        total_revenue += float(req.final_amount)
+                    except (ValueError, TypeError):
+                        pass
+            
+            # Add summary table
+            summary_data = [
+                ["Metric", "Value"],
+                ["New Users", str(new_users)],
+                ["Service Requests", str(new_requests)],
+                ["Completed Requests", str(completed_requests)],
+                ["Total Revenue", f"₹{total_revenue:.2f}"]
+            ]
+            
+            summary_table = Table(summary_data, colWidths=[300, 200])
+            summary_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (1, 0), colors.grey),
+                ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (1, 0), 14),
+                ('BOTTOMPADDING', (0, 0), (1, 0), 12),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            elements.append(summary_table)
+            elements.append(Spacer(1, 12))
+            
+            # Top services section
+            elements.append(Paragraph("Most Requested Services", styles["Heading2"]))
+            elements.append(Spacer(1, 6))
+            
+            # Get services with request counts
+            from sqlalchemy import func
+            services_with_counts = []
+            try:
+                services_with_counts = db.session.query(
+                    Service.name, 
+                    func.count(ServiceRequest.id).label('request_count')
+                ).join(
+                    ServiceRequest, ServiceRequest.service_id == Service.id
+                ).group_by(
+                    Service.id
+                ).order_by(
+                    func.count(ServiceRequest.id).desc()
+                ).limit(5).all()
+            except Exception as e:
+                print(f"Error getting service counts: {str(e)}")
+                # Fallback to a manual count
+                service_count_dict = {}
+                for req in ServiceRequest.query.all():
+                    service = Service.query.get(req.service_id)
+                    if service:
+                        service_name = service.name
+                        if service_name in service_count_dict:
+                            service_count_dict[service_name] += 1
+                        else:
+                            service_count_dict[service_name] = 1
+                
+                # Convert to sorted list of tuples
+                services_with_counts = [(name, count) for name, count in 
+                                       sorted(service_count_dict.items(), key=lambda x: x[1], reverse=True)[:5]]
+            
+            if services_with_counts:
+                services_data = [["Service Name", "Number of Requests"]]
+                for service in services_with_counts:
+                    services_data.append([service[0], str(service[1])])
+                
+                services_table = Table(services_data, colWidths=[300, 200])
+                services_table.setStyle(TableStyle([
+                    ('BACKGROUND', (0, 0), (1, 0), colors.grey),
+                    ('TEXTCOLOR', (0, 0), (1, 0), colors.whitesmoke),
+                    ('ALIGN', (0, 0), (1, 0), 'CENTER'),
+                    ('FONTNAME', (0, 0), (1, 0), 'Helvetica-Bold'),
+                    ('FONTSIZE', (0, 0), (1, 0), 14),
+                    ('BOTTOMPADDING', (0, 0), (1, 0), 12),
+                    ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                    ('GRID', (0, 0), (-1, -1), 1, colors.black)
+                ]))
+                elements.append(services_table)
+            else:
+                elements.append(Paragraph("No service requests in the selected period", styles["Normal"]))
+            
+            # Build the PDF
+            doc.build(elements)
+            
+            print(f"PDF report generated successfully: {filename}")
+            return {
+                "status": "success",
+                "filename": filename,
+                "filepath": filepath
+            }
+    except Exception as e:
+        import traceback
+        print(f"PDF Generation Error: {str(e)}")
+        print(traceback.format_exc())
+        return {
+            "status": "error",
+            "error": str(e)
+        }
+
+@api.route('/user/settings', methods=['GET', 'PUT'])
+@auth_required('token')
+def user_settings():
+    """
+    Get or update user settings
+    """
+    try:
+        if request.method == 'GET':
+            # Default settings for all users
+            settings = {
+                'notifications': {
+                    'email': True,
+                    'sms': False,
+                    'push': True
+                },
+                'privacy': {
+                    'show_profile': True,
+                    'show_contact': False
+                },
+                'preferences': {
+                    'theme': 'light',
+                    'language': 'en'
+                }
+            }
+            
+            # TODO: In a real implementation, we would fetch user settings from the database
+            # For now, we'll just return default settings
+            
+            return jsonify({
+                'success': True,
+                'settings': settings
+            })
+        
+        elif request.method == 'PUT':
+            # Get request body
+            data = request.get_json()
+            if not data or 'settings' not in data:
+                return jsonify({
+                    'success': False,
+                    'error': 'Bad Request',
+                    'message': 'Settings object is required'
+                }), 400
+            
+            # TODO: In a real implementation, we would validate and save the settings to the database
+            # For now, we'll just return success
+            
+            return jsonify({
+                'success': True,
+                'message': 'Settings updated successfully'
+            })
+    except Exception as e:
+        print(f"Error handling user settings: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': 'Failed to process settings',
+            'message': str(e)
+        }), 500
+
+# PDF Report Generation
+@api.route('/api/generate-pdf')
+@auth_required('token')
+@roles_required('admin')
+def generate_pdf():
+    try:
+        print("Starting PDF report generation...")
+        # Launch the celery task
+        from .task import generate_monthly_pdf
+        result = generate_monthly_pdf.delay()
+        print(f"PDF generation task launched with ID: {result.id}")
+        return jsonify({
+            'id': result.id,
+            'message': 'PDF report generation started'
+        })
+    except Exception as e:
+        import traceback
+        print(f"Error starting PDF generation: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({
+            'error': f'Failed to start PDF generation: {str(e)}'
+        }), 500
+
+@api.route('/api/pdf-result/<task_id>')
+@auth_required('token')
+@roles_required('admin')
+def pdf_result(task_id):
+    try:
+        print(f"Checking PDF result for task ID: {task_id}")
+        from celery.result import AsyncResult
+        res = AsyncResult(task_id)
+
+        if not res.ready():
+            return jsonify({'ready': False, 'message': 'PDF still generating...'}), 202
+        
+        result = res.result
+        
+        if not res.successful() or result.get('status') == 'error':
+            error_msg = result.get('error', 'Unknown error') if isinstance(result, dict) else 'PDF generation failed'
+            return jsonify({'ready': True, 'successful': False, 'error': error_msg}), 500
+
+        filename = result.get('filename')
+        
+        # Validate file existence
+        import os
+        PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        static_dir = os.path.join(PROJECT_ROOT, 'static')
+        file_path = os.path.join(static_dir, filename)
+        print(f"Flask looking for PDF file at: {file_path}")
+        
+        if not os.path.exists(file_path):
+            return jsonify({'ready': True, 'successful': False, 'error': 'PDF file not found'}), 500
+        
+        from flask import send_from_directory
+        return send_from_directory(static_dir, filename, as_attachment=True, download_name=filename)
+
+    except Exception as e:
+        import traceback
+        print(f"Error retrieving PDF: {str(e)}")
+        print(traceback.format_exc())
+        return jsonify({'error': f'Error retrieving PDF: {str(e)}'}), 500
